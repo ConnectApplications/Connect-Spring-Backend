@@ -1,8 +1,14 @@
 package com.connectbundle.connect.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectMember {
 
     @Id
@@ -19,11 +25,4 @@ public class ProjectMember {
     private String memberRole;
 
 
-    public ProjectMember() {}
-
-    public ProjectMember(String memberRollNo, String memberName, String memberRole) {
-        this.memberRollNo = memberRollNo;
-        this.memberName = memberName;
-        this.memberRole = memberRole;
-    }
 }

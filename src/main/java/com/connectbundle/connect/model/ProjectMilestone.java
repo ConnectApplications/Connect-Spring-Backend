@@ -1,10 +1,16 @@
 package com.connectbundle.connect.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectMilestone {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,11 +25,4 @@ public class ProjectMilestone {
     @Column(nullable = false)
     private boolean completed;
 
-    public ProjectMilestone() {}
-
-    public ProjectMilestone(String milestoneName, LocalDate expectedDate, boolean completed) {
-        this.milestoneName = milestoneName;
-        this.expectedDate = expectedDate;
-        this.completed = completed;
-    }
 }

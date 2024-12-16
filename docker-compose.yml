@@ -2,9 +2,26 @@ version: '3.1'
 
 services:
   db:
-    image: postgres
-    ports:
-      - "4321:5432"
-    restart: always
+    image: postgres:14
+    container_name: postgres_container
     environment:
-      POSTGRES_PASSWORD : admin
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: roOt@123
+      POSTGRES_DB: connect
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: connect_app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/connect
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: roOt@123
+    depends_on:
+      - db
+
+volumes:
+  db_data:
