@@ -1,4 +1,4 @@
-package com.connectbundle.connect.configs;
+package com.connectbundle.connect.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +21,7 @@ public class BaseResponse<T> {
                 .body(new BaseResponse<>(data, message, status.value(), "success", count));
     }
 
+    // do we need T here ?
     public static <T> ResponseEntity<BaseResponse<T>> error(String message, HttpStatus status) {
         return ResponseEntity.status(status)
                 .body(new BaseResponse<>(null, message, status.value(), "Error", 0));

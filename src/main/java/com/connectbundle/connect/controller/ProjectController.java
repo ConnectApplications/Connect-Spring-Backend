@@ -1,36 +1,38 @@
-package com.connectbundle.connect.controller;
+//TODO : Need to refactor ig
 
-import com.connectbundle.connect.configs.BaseResponse;
-import com.connectbundle.connect.model.Project;
-import com.connectbundle.connect.service.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+// package com.connectbundle.connect.controller;
 
-import java.util.List;
+// import com.connectbundle.connect.configs.BaseResponse;
+// import com.connectbundle.connect.model.Project;
+// import com.connectbundle.connect.service.ProjectService;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.http.HttpStatus;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api")
-public class ProjectController extends BaseApiController{
+// import java.util.List;
 
-    @Autowired
-    public ProjectService service;
+// @RestController
+// @RequestMapping("/api")
+// public class ProjectController{
 
-    @GetMapping("/projects")
-    public List<Project> getAll(){
-        return service.getAllProjects();
-    }
+//     @Autowired
+//     public ProjectService service;
 
-    @PostMapping("/projects")
-    public void createJob(@RequestBody Project project){
+//     @GetMapping("/projects")
+//     public List<Project> getAll(){
+//         return service.getAllProjects();
+//     }
 
-        service.createProject(project);
-    }
+//     @PostMapping("/projects")
+//     public void createJob(@RequestBody Project project){
 
-    @GetMapping("/projectser")
-    public ResponseEntity<BaseResponse<List<String>>> getProjects() {
-        List<String> projects = List.of("Project A", "Project B", "Project C");
-        return BaseResponse.success(projects, "Projects fetched successfully", HttpStatus.OK,0);
-    }
-}
+//         service.createProject(project);
+//     }
+
+//     @GetMapping("/projectser")
+//     public ResponseEntity<BaseResponse<List<String>>> getProjects() {
+//         List<String> projects = List.of("Project A", "Project B", "Project C");
+//         return BaseResponse.success(projects, "Projects fetched successfully", HttpStatus.OK,0);
+//     }
+// }
