@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.connectbundle.connect.configs.BaseResponse;
+import com.connectbundle.connect.dto.BaseResponse;
 
 @RestController
 @RequestMapping("/api/test")
