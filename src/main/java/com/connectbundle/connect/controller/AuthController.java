@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.LoginRequest;
-import com.connectbundle.connect.model.Role;
 import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.service.JWTService;
 import com.connectbundle.connect.service.UserService;
