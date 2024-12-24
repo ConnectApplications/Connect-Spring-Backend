@@ -16,8 +16,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
-
-
 @Service
 public class JWTService {
 
@@ -35,35 +33,35 @@ public class JWTService {
     }
 
     public String generateToken(String username, String role) {
-        Map<String,Object> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
         Key key = getSigningKey();
         return Jwts.builder()
-                   .claims()
-                   .add(claims)
-                   .subject(username)
-                   .issuedAt(new Date(System.currentTimeMillis()))
-                   .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                   .and()
-                   .signWith(key)
-                   .compact();
+                .claims()
+                .add(claims)
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .and()
+                .signWith(key)
+                .compact();
     }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    private <T> T extractClaim(String token, Function<Claims,T> claimResolver) {
+    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                   .verifyWith(getSigningKey())
-                   .build()
-                   .parseSignedClaims(token)
-                   .getPayload();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
@@ -79,7 +77,7 @@ public class JWTService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    public String extractRoles (String token) {
+    public String extractRoles(String token) {
         Claims claims = extractAllClaims(token);
         return (String) claims.get("role");
     }
