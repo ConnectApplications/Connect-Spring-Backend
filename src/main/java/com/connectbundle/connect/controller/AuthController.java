@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.LoginRequest;
+import com.connectbundle.connect.model.Role;
 import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.service.JWTService;
 import com.connectbundle.connect.service.UserService;
@@ -27,9 +28,11 @@ public class AuthController {
     @PostMapping("/login")
     // Login User
     public ResponseEntity<BaseResponse<String>> loginUser (@RequestBody LoginRequest loginRequest) {
-        boolean isValidLogin = userService.loginUser(loginRequest.getUsername(),loginRequest.getPassword());
+        Object[] check = userService.loginUser(loginRequest.getUsername(),loginRequest.getPassword());
+        boolean isValidLogin = (boolean) check[0];
+        String role = check[1].toString();
         if (isValidLogin) {
-            String token = jwtService.generateToken(loginRequest.getUsername());
+            String token = jwtService.generateToken(loginRequest.getUsername(),role);
             return BaseResponse.success(token, "Login Success", HttpStatus.OK, 0);
         }
         return BaseResponse.error("Incorrect username or password", HttpStatus.FORBIDDEN);
