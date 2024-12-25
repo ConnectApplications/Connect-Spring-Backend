@@ -16,6 +16,7 @@ import com.connectbundle.connect.repository.UserRepository;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.Getter;
 
 @Service
 public class EmailService {
@@ -28,6 +29,19 @@ public class EmailService {
 
     @Autowired
     private UserRepository userRepository;
+
+    // RESPONSE CLASS
+    @Getter
+    public static class EmailServiceResponse {
+        private final boolean success;
+        private final String message;
+
+        public EmailServiceResponse(boolean success, String message) {
+            this.message = message;
+            this.success = success;
+        }
+
+    }
 
     private int generateOtp() {
         SecureRandom secureRandom = new SecureRandom();
@@ -44,17 +58,17 @@ public class EmailService {
         emailSender.send(message);
     }
 
-    public Object[] sendOtp(String to) {
+    public EmailServiceResponse sendOtp(String to) {
         Optional<User> optionalUser = userRepository.findByEmail(to);
         if (!optionalUser.isPresent()) {
-            return new Object[] { false, "User with this email id does not exist" };
+            return new EmailServiceResponse(false, "User with this email id does not exist");
         }
         try {
             Optional<OTP> optionalOtp = otpRepository.findByEmail(to);
             if (optionalOtp.isPresent()) {
                 OTP existingOtp = optionalOtp.get();
                 if (!existingOtp.isExpired()) {
-                    return new Object[] { false, "An otp has already been sent and is still valid" };
+                    return new EmailServiceResponse(false, "An OTP has already been sent and is still valid");
                 } else {
                     otpRepository.deleteByEmail(to);
                 }
@@ -76,32 +90,32 @@ public class EmailService {
                 newOtp.setOtp(otp);
                 newOtp.setCreatedAt(LocalDateTime.now());
                 otpRepository.save(newOtp);
-                return new Object[] { true, "Otp sent successfully" };
+                return new EmailServiceResponse(true, "OTP sent successfully");
             } catch (Exception e) {
-                return new Object[] { false, e.getMessage() };
+                return new EmailServiceResponse(false, e.getMessage());
             }
         } catch (MessagingException e) {
-            return new Object[] { false, e.getMessage() };
+            return new EmailServiceResponse(false, e.getMessage());
         }
     }
 
-    public Object[] validateOtp(String email, int otp) {
+    public EmailServiceResponse validateOtp(String email, int otp) {
         try {
             Optional<OTP> optionalOtp = otpRepository.findByEmail(email);
             if (!optionalOtp.isPresent()) {
-                return new Object[] { false, "No record of OTP being sent" };
+                return new EmailServiceResponse(false, "No record of OTP being sent");
             }
             OTP otpRecord = optionalOtp.get();
             if (otpRecord.isExpired()) {
-                return new Object[] { false, "Invalid/Expired OTP" };
+                return new EmailServiceResponse(false, "Invalid/Expired OTP");
             }
             if (otpRecord.getOtp() == otp) {
                 otpRepository.deleteByEmail(email);
-                return new Object[] { true, "OTP validated Successfully" };
+                return new EmailServiceResponse(true, "OTP validated successfully");
             }
-            return new Object[] { false, "Invalid/Expired OTP" };
+            return new EmailServiceResponse(false, "Invalid/Expired OTP");
         } catch (Exception e) {
-            return new Object[] { false, e.getMessage() };
+            return new EmailServiceResponse(false, e.getMessage());
         }
     }
 

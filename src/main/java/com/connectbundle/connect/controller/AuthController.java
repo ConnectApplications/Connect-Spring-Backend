@@ -14,8 +14,10 @@ import com.connectbundle.connect.dto.SendOtpRequest;
 import com.connectbundle.connect.dto.ValidateOtpRequest;
 import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.service.EmailService;
+import com.connectbundle.connect.service.EmailService.EmailServiceResponse;
 import com.connectbundle.connect.service.JWTService;
 import com.connectbundle.connect.service.UserService;
+import com.connectbundle.connect.service.UserService.UserServiceResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,9 +35,9 @@ public class AuthController {
     @PostMapping("/login")
     // Login User
     public ResponseEntity<BaseResponse<String>> loginUser(@RequestBody LoginRequest loginRequest) {
-        Object[] check = userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
-        boolean isValidLogin = (boolean) check[0];
-        String role = check[1].toString();
+        UserServiceResponse check = userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
+        boolean isValidLogin = check.isSuccess();
+        String role = check.getMessage(); // GET ROLE
         if (isValidLogin) {
             String token = jwtService.generateToken(loginRequest.getUsername(), role);
             return BaseResponse.success(token, "Login Success", HttpStatus.OK, 0);
@@ -58,9 +60,9 @@ public class AuthController {
     // Send an OTP to the user
     public ResponseEntity<BaseResponse<String>> sendOtp(@RequestBody SendOtpRequest sendOtpRequest) {
         try {
-            Object[] sendOtpResponse = emailService.sendOtp(sendOtpRequest.getEmail());
-            boolean success = (boolean) sendOtpResponse[0];
-            String message = sendOtpResponse[1].toString();
+            EmailServiceResponse sendOtpResponse = emailService.sendOtp(sendOtpRequest.getEmail());
+            boolean success = sendOtpResponse.isSuccess();
+            String message = sendOtpResponse.getMessage();
             if (success) {
                 return BaseResponse.success("", message, HttpStatus.OK, 0);
             } else {
@@ -75,10 +77,10 @@ public class AuthController {
     // Validate an OTP
     public ResponseEntity<BaseResponse<String>> validateOtp(@RequestBody ValidateOtpRequest validateOtpRequest) {
         try {
-            Object[] validationResponse = emailService.validateOtp(validateOtpRequest.getEmail(),
+            EmailServiceResponse validationResponse = emailService.validateOtp(validateOtpRequest.getEmail(),
                     Integer.parseInt(validateOtpRequest.getOtp()));
-            boolean success = (boolean) validationResponse[0];
-            String message = validationResponse[1].toString();
+            boolean success = validationResponse.isSuccess();
+            String message = validationResponse.getMessage();
             if (success) {
                 return BaseResponse.success("", message, HttpStatus.OK, 0);
             } else {
