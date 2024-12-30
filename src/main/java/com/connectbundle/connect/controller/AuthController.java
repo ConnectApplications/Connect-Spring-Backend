@@ -35,9 +35,10 @@ public class AuthController {
     @PostMapping("/login")
     // Login User
     public ResponseEntity<BaseResponse<String>> loginUser(@RequestBody LoginRequest loginRequest) {
-        UserServiceResponse check = userService.loginUser(loginRequest.getUsername(), loginRequest.getPassword());
+        UserServiceResponse<String> check = userService.loginUser(loginRequest.getUsername(),
+                loginRequest.getPassword());
         boolean isValidLogin = check.isSuccess();
-        String role = check.getMessage(); // GET ROLE
+        String role = check.getData(); // GET ROLE
         if (isValidLogin) {
             String token = jwtService.generateToken(loginRequest.getUsername(), role);
             return BaseResponse.success(token, "Login Success", HttpStatus.OK, 0);
