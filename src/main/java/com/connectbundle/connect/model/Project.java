@@ -1,9 +1,23 @@
 package com.connectbundle.connect.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -19,7 +33,7 @@ public class Project {
     @Column(nullable = false)
     private String projectName;
 
-    @Column(nullable = false,length=1000)
+    @Column(nullable = false, length = 1000)
     private String projectDescription;
 
     @Column(nullable = false)
@@ -68,6 +82,5 @@ public class Project {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
 
 }

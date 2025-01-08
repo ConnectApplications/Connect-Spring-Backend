@@ -1,38 +1,39 @@
-//TODO : Need to refactor ig
+package com.connectbundle.connect.controller;
 
-// package com.connectbundle.connect.controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-// import com.connectbundle.connect.configs.BaseResponse;
-// import com.connectbundle.connect.model.Project;
-// import com.connectbundle.connect.service.ProjectService;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.HttpStatus;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.*;
+import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.model.Project;
+import com.connectbundle.connect.service.ProjectService;
+import com.connectbundle.connect.service.ProjectService.ProjectServiceResponse;
 
-// import java.util.List;
+@RestController
+@RequestMapping("/api/project")
+public class ProjectController {
 
-// @RestController
-// @RequestMapping("/api")
-// public class ProjectController{
+    @Autowired
+    ProjectService projectService;
 
-//     @Autowired
-//     public ProjectService service;
+    @GetMapping("/getProject/{id}")
+    // Get a project by its id
+    public ResponseEntity<BaseResponse<Project>> getProject(@PathVariable Long id) {
+        try {
+            ProjectServiceResponse<Project> projectServiceResponse = projectService.getProjectByID(id);
+            boolean success = projectServiceResponse.isSuccess();
+            if (success) {
+                Project project = projectServiceResponse.getData();
+                String message = projectServiceResponse.getMessage();
+                return BaseResponse.success(project, message, HttpStatus.OK, 0);
+            }
+        } catch (Exception e) {
+            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-//     @GetMapping("/projects")
-//     public List<Project> getAll(){
-//         return service.getAllProjects();
-//     }
-
-//     @PostMapping("/projects")
-//     public void createJob(@RequestBody Project project){
-
-//         service.createProject(project);
-//     }
-
-//     @GetMapping("/projectser")
-//     public ResponseEntity<BaseResponse<List<String>>> getProjects() {
-//         List<String> projects = List.of("Project A", "Project B", "Project C");
-//         return BaseResponse.success(projects, "Projects fetched successfully", HttpStatus.OK,0);
-//     }
-// }
+}
