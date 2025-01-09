@@ -48,6 +48,7 @@ public class AuthController {
 
     @PostMapping("/register")
     // Register User
+    // TODO : EXTRACT IMAGE TO USE FOR PFP AND SAVE
     public ResponseEntity<BaseResponse<User>> registerUser(@RequestBody User newUser) {
         try {
             User registeredUser = userService.registerUser(newUser);

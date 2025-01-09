@@ -77,7 +77,7 @@ public class UserService {
         }
     }
 
-    public UserServiceResponse<User> deleteUserByUsername(String username) {
+    public UserServiceResponse<Void> deleteUserByUsername(String username) {
         try {
             Optional<User> optionalUser = userRepository.findByUsername(username);
             if (!optionalUser.isPresent()) {
