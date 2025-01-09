@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.connectbundle.connect.model.Role;
 import com.connectbundle.connect.model.User;
@@ -15,6 +16,9 @@ import lombok.Getter;
 
 @Service
 public class UserService {
+
+    @Autowired
+    private S3Service s3Service;
 
     @Autowired
     private UserRepository userRepository;
@@ -46,8 +50,20 @@ public class UserService {
     }
 
     public User registerUser(User user) {
+        user.setProfilePicture("");
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    public UserServiceResponse<Void> uploadUserImage(MultipartFile file, User user) {
+        try {
+            String uniqueFileName = s3Service.uploadFile(file, "UserProfilePicture");
+            user.setProfilePicture("https://connect-beta-2" + ".s3.amazonaws.com/" + uniqueFileName);
+            userRepository.save(user);
+            return new UserServiceResponse<>(true, "Picture uploaded successfully", null);
+        } catch (Exception e) {
+            return new UserServiceResponse<>(false, e.getMessage(), null);
+        }
     }
 
     public UserServiceResponse<User> getUserByUsername(String username) {

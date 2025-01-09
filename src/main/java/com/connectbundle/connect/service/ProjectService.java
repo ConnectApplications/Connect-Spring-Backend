@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.connectbundle.connect.model.Project;
 import com.connectbundle.connect.repository.ProjectRepository;
@@ -14,7 +15,10 @@ import lombok.Getter;
 @Service
 public class ProjectService {
     @Autowired
-    ProjectRepository projectRepository;
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private S3Service s3Service;
 
     // REPONSE CLASS
     @Getter
@@ -46,8 +50,20 @@ public class ProjectService {
 
     public ProjectServiceResponse<Project> createProject(Project project) {
         try {
+            project.setProjectImage("");
             Project createdProject = projectRepository.save(project);
             return new ProjectServiceResponse<>(true, "Project created", createdProject);
+        } catch (Exception e) {
+            return new ProjectServiceResponse<>(false, e.getMessage(), null);
+        }
+    }
+
+    public ProjectServiceResponse<Void> uploadProjectImage(MultipartFile file, Project project) {
+        try {
+            String uniqueFileName = s3Service.uploadFile(file, "ProjectImage");
+            project.setProjectImage("https://connect-beta-2" + ".s3.amazonaws.com/" + uniqueFileName);
+            projectRepository.save(project);
+            return new ProjectServiceResponse<>(true, "File Uploaded", null);
         } catch (Exception e) {
             return new ProjectServiceResponse<>(false, e.getMessage(), null);
         }
