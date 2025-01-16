@@ -8,8 +8,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.connectbundle.connect.dto.AddUserSkillDTO;
 import com.connectbundle.connect.model.Role;
 import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.UserSkill;
 import com.connectbundle.connect.repository.UserRepository;
 
 import lombok.Getter;
@@ -104,6 +106,26 @@ public class UserService {
                 userRepository.deleteById(userID);
                 return new UserServiceResponse<>(true, "User deleted successfully", null);
 
+            }
+        } catch (Exception e) {
+            return new UserServiceResponse<>(false, e.getMessage(), null);
+        }
+    }
+
+    public UserServiceResponse<Void> addSkillToUser(String username, AddUserSkillDTO skill) {
+        try {
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+            if (!optionalUser.isPresent()) {
+                return new UserServiceResponse<>(false, "User with this username not found", null);
+            } else {
+                User user = optionalUser.get();
+                UserSkill newSkill = new UserSkill();
+                newSkill.setSkillName(skill.getSkillName());
+                newSkill.setProficiencyLevel(skill.getProficiencyLevel());
+                newSkill.setUser(user);
+                user.getUserSkills().add(newSkill);
+                userRepository.save(user);
+                return new UserServiceResponse<>(true, "SKill added successfully", null);
             }
         } catch (Exception e) {
             return new UserServiceResponse<>(false, e.getMessage(), null);
