@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 public abstract class BaseApiController{
     @RequestMapping("/test")
     public String test(){
-        return "Server is OK!!!";
+        return "Server is  Running!!";
     }
 }
