@@ -1,4 +1,4 @@
-package com.connectbundle.connect.model;
+package com.connectbundle.connect.model.enums;
 
 public enum Role {
     STUDENT,

@@ -1,5 +1,7 @@
 package com.connectbundle.connect.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,23 +16,30 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_skills")
+@Table(name = "event")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserSkill {
+@NoArgsConstructor
+public class Event {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String skillName;
-
-    @Column(nullable = false)
-    private int proficiencyLevel;
-
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "organized_by", referencedColumnName = "id", nullable = false)
     private User user;
+
+    @Column(nullable = false)
+    private String event_name;
+
+    @Column(nullable = false)
+    private LocalDate date;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String location;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String description;
 }

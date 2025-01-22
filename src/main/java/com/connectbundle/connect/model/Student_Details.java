@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,23 +14,23 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_skills")
+@Table(name = "student_details")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSkill {
+public class Student_Details {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String skillName;
-
-    @Column(nullable = false)
-    private int proficiencyLevel;
-
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Column(nullable = false, unique = true)
+    private String enrollmentNumber;
+
+    @Column(nullable = false)
+    private Integer batchYear;
 }

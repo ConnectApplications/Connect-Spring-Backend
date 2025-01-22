@@ -1,7 +1,10 @@
 package com.connectbundle.connect.model;
 
-import jakarta.persistence.Column;
+import com.connectbundle.connect.model.enums.ClubRoleEnum;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,23 +17,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_skills")
+@Table(name = "club_members")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserSkill {
+@NoArgsConstructor
+public class ClubMember {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String skillName;
-
-    @Column(nullable = false)
-    private int proficiencyLevel;
+    @ManyToOne
+    @JoinColumn(name = "club_id", referencedColumnName = "id", nullable = false)
+    private Club club;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
+
+    @Enumerated(EnumType.STRING)
+    private ClubRoleEnum role;
+
 }
