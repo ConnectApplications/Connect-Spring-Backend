@@ -1,4 +1,4 @@
-package com.connectbundle.connect.dto;
+package com.connectbundle.connect.dto.UserDTO;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,44 +1,28 @@
 package com.connectbundle.connect.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.connectbundle.connect.dto.UserDTO.AddUserSkillDTO;
+import com.connectbundle.connect.dto.UserDTO.CreateUserDTO;
+import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.UserSkill;
+import com.connectbundle.connect.model.enums.Role;
+import com.connectbundle.connect.repository.UserRepository;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.connectbundle.connect.dto.AddUserSkillDTO;
-import com.connectbundle.connect.model.Role;
-import com.connectbundle.connect.model.User;
-import com.connectbundle.connect.model.UserSkill;
-import com.connectbundle.connect.repository.UserRepository;
-
-import lombok.Getter;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
     @Autowired
     private S3Service s3Service;
-
     @Autowired
     private UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
-
-    // REPONSE CLASS
-    @Getter
-    public static class UserServiceResponse<T> {
-        private final boolean success;
-        private final String message;
-        private final T data;
-
-        public UserServiceResponse(boolean success, String message, T data) {
-            this.message = message;
-            this.success = success;
-            this.data = data;
-        }
-    }
 
     public UserServiceResponse<String> loginUser(String username, String password) {
         Optional<User> optionalUser = userRepository.findByUsername(username);
@@ -51,10 +35,11 @@ public class UserService {
         return new UserServiceResponse<>(false, "", null);
     }
 
-    public User registerUser(User user) {
-        user.setProfilePicture("");
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    public User registerUser(CreateUserDTO user) {
+        User newUser = new User();
+        newUser.setProfilePicture("");
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(newUser);
     }
 
     public UserServiceResponse<Void> uploadUserImage(MultipartFile file, User user) {
@@ -76,6 +61,19 @@ public class UserService {
                 return new UserServiceResponse<>(true, "User fetched successfully", user);
             } else {
                 return new UserServiceResponse<>(false, "User does not exist", null);
+            }
+        } catch (Exception e) {
+            return new UserServiceResponse<>(false, e.getMessage(), null);
+        }
+    }
+
+    public UserServiceResponse<User> getUserByID(Long id) {
+        try {
+            Optional<User> optionalUser = userRepository.findById(id);
+            if (optionalUser.isPresent()) {
+                return new UserServiceResponse<>(true, "User fetched successfully", optionalUser.get());
+            } else {
+                return new UserServiceResponse<>(false, "User not found", null);
             }
         } catch (Exception e) {
             return new UserServiceResponse<>(false, e.getMessage(), null);
@@ -129,6 +127,20 @@ public class UserService {
             }
         } catch (Exception e) {
             return new UserServiceResponse<>(false, e.getMessage(), null);
+        }
+    }
+
+    // REPONSE CLASS
+    @Getter
+    public static class UserServiceResponse<T> {
+        private final boolean success;
+        private final String message;
+        private final T data;
+
+        public UserServiceResponse(boolean success, String message, T data) {
+            this.message = message;
+            this.success = success;
+            this.data = data;
         }
     }
 

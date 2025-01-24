@@ -36,14 +36,14 @@ public class ResearchProposals {
 
     @ManyToOne
     @JoinColumn(name = "submitted_by", referencedColumnName = "id", nullable = false)
-    private User submittedBy; // Foreign key to users
+    private User submittedBy;
 
     @Column(nullable = false)
     private LocalDate submissionDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ResearchProposalStatus status; // SUBMITTED, REVIEWED, APPROVED, REJECTED
+    private ResearchProposalStatus status;
 
     @Column(nullable = false)
     private Double fundingAmount;

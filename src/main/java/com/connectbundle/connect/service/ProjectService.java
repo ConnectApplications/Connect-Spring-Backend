@@ -1,16 +1,14 @@
 package com.connectbundle.connect.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.connectbundle.connect.model.Project;
+import com.connectbundle.connect.repository.ProjectRepository;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.connectbundle.connect.model.Project;
-import com.connectbundle.connect.repository.ProjectRepository;
-
-import lombok.Getter;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjectService {
@@ -19,20 +17,6 @@ public class ProjectService {
 
     @Autowired
     private S3Service s3Service;
-
-    // REPONSE CLASS
-    @Getter
-    public static class ProjectServiceResponse<T> {
-        private final boolean success;
-        private final String message;
-        private final T data;
-
-        public ProjectServiceResponse(boolean success, String message, T data) {
-            this.message = message;
-            this.success = success;
-            this.data = data;
-        }
-    }
 
     public ProjectServiceResponse<Project> getProjectByID(Long id) {
         try {
@@ -95,6 +79,20 @@ public class ProjectService {
             }
         } catch (Exception e) {
             return new ProjectServiceResponse<>(false, e.getMessage(), null);
+        }
+    }
+
+    // RESPONSE CLASS
+    @Getter
+    public static class ProjectServiceResponse<T> {
+        private final boolean success;
+        private final String message;
+        private final T data;
+
+        public ProjectServiceResponse(boolean success, String message, T data) {
+            this.message = message;
+            this.success = success;
+            this.data = data;
         }
     }
 
