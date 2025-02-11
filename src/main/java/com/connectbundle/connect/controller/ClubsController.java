@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.connectbundle.connect.dto.BaseResponse;
@@ -21,7 +23,8 @@ import com.connectbundle.connect.service.ClubsService.ClubServiceResponse;
 
 import jakarta.validation.Valid;
 
-@RestController("/api/clubs")
+@RestController()
+@RequestMapping("/api/clubs")
 public class ClubsController {
 
     @Autowired
@@ -42,8 +45,8 @@ public class ClubsController {
         }
     }
 
-    @GetMapping("/:id")
-    public ResponseEntity<BaseResponse<Club>> getClubById(Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponse<Club>> getClubById(@PathVariable Long id) {
         try {
             ClubServiceResponse<Club> clubServiceResponse = clubsService.getClubById(id);
             if (clubServiceResponse.isSuccess()) {

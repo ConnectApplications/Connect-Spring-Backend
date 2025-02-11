@@ -1,21 +1,25 @@
 package com.connectbundle.connect.controller;
 
-import com.connectbundle.connect.dto.AwardsDTO.CreateAwardDTO;
-import com.connectbundle.connect.dto.BaseResponse;
-import com.connectbundle.connect.model.Awards;
-import com.connectbundle.connect.service.AwardsService;
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.connectbundle.connect.dto.AwardsDTO.CreateAwardDTO;
+import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.model.Awards;
+import com.connectbundle.connect.service.AwardsService;
 
-@RestController("/api/awards")
+import jakarta.validation.Valid;
+
+@RestController()
+@RequestMapping("/api/awards")
 public class AwardsController {
 
     @Autowired
@@ -27,7 +31,8 @@ public class AwardsController {
         try {
             AwardsService.AwardServiceResponse<List<Awards>> awardServiceResponse = awardsService.getAllAwards();
             if (awardServiceResponse.isSuccess()) {
-                return BaseResponse.success(awardServiceResponse.getData(), awardServiceResponse.getMessage(), HttpStatus.OK, awardServiceResponse.getData().size());
+                return BaseResponse.success(awardServiceResponse.getData(), awardServiceResponse.getMessage(),
+                        HttpStatus.OK, awardServiceResponse.getData().size());
             } else {
                 return BaseResponse.error(awardServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -42,7 +47,8 @@ public class AwardsController {
         try {
             AwardsService.AwardServiceResponse<Awards> awardServiceResponse = awardsService.createAward(award);
             if (awardServiceResponse.isSuccess()) {
-                return BaseResponse.success(awardServiceResponse.getData(), awardServiceResponse.getMessage(), HttpStatus.OK, 0);
+                return BaseResponse.success(awardServiceResponse.getData(), awardServiceResponse.getMessage(),
+                        HttpStatus.OK, 0);
             } else {
                 return BaseResponse.error(awardServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }

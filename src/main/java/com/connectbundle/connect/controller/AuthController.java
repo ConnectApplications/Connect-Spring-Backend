@@ -1,5 +1,13 @@
 package com.connectbundle.connect.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.connectbundle.connect.dto.AuthDTO.LoginRequest;
 import com.connectbundle.connect.dto.AuthDTO.SendOtpRequest;
 import com.connectbundle.connect.dto.AuthDTO.ValidateOtpRequest;
@@ -11,14 +19,8 @@ import com.connectbundle.connect.service.EmailService.EmailServiceResponse;
 import com.connectbundle.connect.service.JWTService;
 import com.connectbundle.connect.service.UserService;
 import com.connectbundle.connect.service.UserService.UserServiceResponse;
+
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
