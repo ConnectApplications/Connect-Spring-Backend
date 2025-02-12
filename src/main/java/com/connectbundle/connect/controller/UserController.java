@@ -19,15 +19,19 @@ import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.service.UserService;
 import com.connectbundle.connect.service.UserService.UserServiceResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController()
 @RequestMapping("/api/user")
+@Tag(name = "User", description = "User Endpoints")
 public class UserController {
 
     @Autowired
     UserService userService;
 
     @GetMapping("/getUser/{username}")
-    // Fetch user by username
+    @Operation(summary = "Get User By Username", description = "Fetch user by username")
     public ResponseEntity<BaseResponse<User>> getUserByUsername(@PathVariable String username) {
         try {
             UserServiceResponse<User> user = userService.getUserByUsername(username);
@@ -44,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping("/uploadProfilePicture/{username}")
-    // Update or Upload user's profile picture by their usernames
+    @Operation(summary = "Upload Profile Picture", description = "Update or upload user's profile picture by their username")
     public ResponseEntity<BaseResponse<Void>> uploadUserProfilePicture(
             @RequestParam("file") MultipartFile file,
             @PathVariable String username) {
@@ -67,7 +71,7 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUser/{username}")
-    // Delete user by username
+    @Operation(summary = "Delete User", description = "Delete user by username")
     public ResponseEntity<BaseResponse<Void>> deleteUserByUsername(@PathVariable String username) {
         try {
             UserServiceResponse<Void> deletedUser = userService.deleteUserByUsername(username);
@@ -84,7 +88,7 @@ public class UserController {
     }
 
     @PostMapping("/addSkill/{username}")
-    // Add a skill to a user. Skill should be sent in the request body
+    @Operation(summary = "Add Skill", description = "Add a skill to a user. Skill should be sent in the request body")
     public ResponseEntity<BaseResponse<Void>> addSkillToUser(
             @PathVariable String username,
             @RequestBody AddUserSkillDTO skill) {

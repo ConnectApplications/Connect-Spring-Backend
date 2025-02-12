@@ -16,17 +16,20 @@ import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.model.Awards;
 import com.connectbundle.connect.service.AwardsService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController()
 @RequestMapping("/api/awards")
+@Tag(name = "Awards", description = "Awards Endpoints")
 public class AwardsController {
 
     @Autowired
     AwardsService awardsService;
 
     @GetMapping()
-    // Get all Awards
+    @Operation(summary = "Get All Awards", description = "Retrieve a list of all awards")
     public ResponseEntity<BaseResponse<List<Awards>>> getAllAwards() {
         try {
             AwardsService.AwardServiceResponse<List<Awards>> awardServiceResponse = awardsService.getAllAwards();
@@ -42,7 +45,7 @@ public class AwardsController {
     }
 
     @PostMapping("/createAward")
-    // Create / Add a new Award
+    @Operation(summary = "Create Award", description = "Create a new award")
     public ResponseEntity<BaseResponse<Awards>> createAward(@Valid @RequestBody CreateAwardDTO award) {
         try {
             AwardsService.AwardServiceResponse<Awards> awardServiceResponse = awardsService.createAward(award);

@@ -17,10 +17,13 @@ import com.connectbundle.connect.model.Event;
 import com.connectbundle.connect.service.EventService;
 import com.connectbundle.connect.service.EventService.EventServiceResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController()
 @RequestMapping("/api/events")
+@Tag(name = "Events", description = "Events Endpoints")
 public class EventsController {
 
     @Autowired
@@ -28,6 +31,7 @@ public class EventsController {
 
     // Get all Events
     @GetMapping()
+    @Operation(summary = "Get All Events", description = "Retrieve a list of all events")
     public ResponseEntity<BaseResponse<List<Event>>> getAllEvents() {
         try {
             EventServiceResponse<List<Event>> allEvents = eventService.getAllEvents();
@@ -44,6 +48,7 @@ public class EventsController {
 
     // Create An Event
     @PostMapping()
+    @Operation(summary = "Create Event", description = "Create a new event")
     public ResponseEntity<BaseResponse<Event>> createEvent(@Valid @RequestBody CreateEventDTO createEvent) {
         try {
             EventServiceResponse<Event> eventServiceResponse = eventService.createEvent(createEvent);

@@ -1,26 +1,40 @@
 package com.connectbundle.connect.controller;
 
-import com.connectbundle.connect.dto.BaseResponse;
-import com.connectbundle.connect.model.Project;
-import com.connectbundle.connect.service.ProjectService;
-import com.connectbundle.connect.service.ProjectService.ProjectServiceResponse;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.dto.ProjectsDTO.CreateProjectDTO;
+import com.connectbundle.connect.model.Project;
+import com.connectbundle.connect.service.ProjectService;
+import com.connectbundle.connect.service.ProjectService.ProjectServiceResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/project")
+@Tag(name = "Project", description = "Project Endpoints")
 public class ProjectController {
 
     @Autowired
     ProjectService projectService;
 
     @GetMapping("/getProject/{id}")
-    // Get a project by its id
+    @Operation(summary = "Get Project By ID", description = "Retrieve a project by its ID")
     public ResponseEntity<BaseResponse<Project>> getProject(@PathVariable Long id) {
         try {
             ProjectServiceResponse<Project> projectServiceResponse = projectService.getProjectByID(id);
@@ -37,8 +51,8 @@ public class ProjectController {
     }
 
     @PostMapping("/createProject")
-    // Create a new project
-    public ResponseEntity<BaseResponse<Project>> createProject(@RequestBody Project project) {
+    @Operation(summary = "Create Project", description = "Create a new project")
+    public ResponseEntity<BaseResponse<Project>> createProject(@Valid @RequestBody CreateProjectDTO project) {
         try {
             ProjectServiceResponse<Project> createdProject = projectService.createProject(project);
             boolean success = createdProject.isSuccess();
@@ -54,7 +68,7 @@ public class ProjectController {
     }
 
     @PostMapping("/uploadProjectImage/{id}")
-    // Upload or update an image for the project with the given ID
+    @Operation(summary = "Upload Project Image", description = "Upload or update an image for the project with the given ID")
     public ResponseEntity<BaseResponse<Void>> uploadProjectImage(
             @RequestParam("file") MultipartFile file,
             @PathVariable Long id) {
@@ -78,8 +92,8 @@ public class ProjectController {
     }
 
     @GetMapping("/getAllProjects")
-    // Get a list of all the projects
-    public ResponseEntity<BaseResponse<List<Project>>> getALlProjects() {
+    @Operation(summary = "Get All Projects", description = "Retrieve a list of all projects")
+    public ResponseEntity<BaseResponse<List<Project>>> getAllProjects() {
         try {
             ProjectServiceResponse<List<Project>> allProjects = projectService.getAllProjects();
             boolean success = allProjects.isSuccess();
@@ -95,7 +109,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("/deleteProject/{id}")
-    // Delete a project by its id
+    @Operation(summary = "Delete Project", description = "Delete a project by its ID")
     public ResponseEntity<BaseResponse<Project>> deleteById(@PathVariable Long id) {
         try {
             ProjectServiceResponse<Project> deletedProject = projectService.deleteProject(id);

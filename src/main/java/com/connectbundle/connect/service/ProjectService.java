@@ -1,14 +1,19 @@
 package com.connectbundle.connect.service;
 
-import com.connectbundle.connect.model.Project;
-import com.connectbundle.connect.repository.ProjectRepository;
-import lombok.Getter;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
+import com.connectbundle.connect.dto.ProjectsDTO.CreateProjectDTO;
+import com.connectbundle.connect.model.Project;
+import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.repository.ProjectRepository;
+import com.connectbundle.connect.service.UserService.UserServiceResponse;
+
+import lombok.Getter;
 
 @Service
 public class ProjectService {
@@ -17,6 +22,9 @@ public class ProjectService {
 
     @Autowired
     private S3Service s3Service;
+
+    @Autowired
+    private UserService userService;
 
     public ProjectServiceResponse<Project> getProjectByID(Long id) {
         try {
@@ -32,10 +40,29 @@ public class ProjectService {
         }
     }
 
-    public ProjectServiceResponse<Project> createProject(Project project) {
+    public ProjectServiceResponse<Project> createProject(CreateProjectDTO project) {
         try {
-            project.setProjectImage("");
-            Project createdProject = projectRepository.save(project);
+            UserServiceResponse<User> verificationFaculty = userService
+                    .getUserByUsername(project.getVerificationFacultyUsername());
+            UserServiceResponse<User> facultyMentor = userService.getUserByUsername(project.getFacultyMentorUsername());
+            if (!verificationFaculty.isSuccess() || !facultyMentor.isSuccess()) {
+                return new ProjectServiceResponse<>(false, "Faculty not found", null);
+            }
+            Project newProject = new Project();
+            newProject.setProjectImage("");
+            newProject.setProjectName(project.getProjectName());
+            newProject.setProjectDescription(project.getProjectDescription());
+            newProject.setPrerequisites(project.getPrerequisites());
+            newProject.setTechStack(project.getTechStack());
+            newProject.setTags(project.getTags());
+            newProject.setProjectDurationMonths(project.getProjectDurationMonths());
+            newProject.setProjectLevel(project.getProjectLevel());
+            newProject.setProjectStatus(project.getProjectStatus());
+            newProject.setMaxTeamSize(project.getMaxTeamSize());
+            newProject.setProjectRepo(project.getProjectRepo());
+            newProject.setFacultyMentor(facultyMentor.getData());
+            newProject.setVerificationFaculty(verificationFaculty.getData());
+            Project createdProject = projectRepository.save(newProject);
             return new ProjectServiceResponse<>(true, "Project created", createdProject);
         } catch (Exception e) {
             return new ProjectServiceResponse<>(false, e.getMessage(), null);

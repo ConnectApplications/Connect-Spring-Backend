@@ -20,10 +20,13 @@ import com.connectbundle.connect.service.JWTService;
 import com.connectbundle.connect.service.UserService;
 import com.connectbundle.connect.service.UserService.UserServiceResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "Authentication Endpoints")
 public class AuthController {
 
     @Autowired
@@ -36,7 +39,7 @@ public class AuthController {
     EmailService emailService;
 
     @PostMapping("/login")
-    // Login User
+    @Operation(summary = "Login User", description = "Authenticate user and return JWT token")
     public ResponseEntity<BaseResponse<String>> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         UserServiceResponse<String> check = userService.loginUser(loginRequest.getUsername(),
                 loginRequest.getPassword());
@@ -50,7 +53,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    // Register User
+    @Operation(summary = "Register User", description = "Register a new user")
     // TODO : EXTRACT IMAGE TO USE FOR PFP AND SAVE
     public ResponseEntity<BaseResponse<User>> registerUser(@Valid @RequestBody CreateUserDTO newUser) {
         try {
@@ -62,7 +65,7 @@ public class AuthController {
     }
 
     @PostMapping("/send-otp")
-    // Send an OTP to the user
+    @Operation(summary = "Send OTP", description = "Send an OTP to the user's email")
     public ResponseEntity<BaseResponse<String>> sendOtp(@Valid @RequestBody SendOtpRequest sendOtpRequest) {
         try {
             EmailServiceResponse sendOtpResponse = emailService.sendOtp(sendOtpRequest.getEmail());
@@ -79,7 +82,7 @@ public class AuthController {
     }
 
     @PostMapping("/validate-otp")
-    // Validate an OTP
+    @Operation(summary = "Validate OTP", description = "Validate the OTP sent to the user's email")
     public ResponseEntity<BaseResponse<String>> validateOtp(@Valid @RequestBody ValidateOtpRequest validateOtpRequest) {
         try {
             EmailServiceResponse validationResponse = emailService.validateOtp(validateOtpRequest.getEmail(),
