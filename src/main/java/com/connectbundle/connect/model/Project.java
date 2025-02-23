@@ -1,9 +1,26 @@
 package com.connectbundle.connect.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.List;
+
+import com.connectbundle.connect.model.enums.ProjectLevelEnum;
+import com.connectbundle.connect.model.enums.ProjectStatusEnum;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -19,55 +36,47 @@ public class Project {
     @Column(nullable = false)
     private String projectName;
 
-    @Column(nullable = false,length=1000)
+    @Column(columnDefinition = "TEXT")
     private String projectDescription;
 
-    @Column(nullable = false)
-    private String projectOwner;
+    @Column(columnDefinition = "TEXT")
+    private String prerequisites;
 
-    @Column(nullable = false)
-    private String projectLevel;
+    @ManyToOne
+    @JoinColumn(name = "facultyMentorID", referencedColumnName = "id", nullable = false)
+    private User facultyMentor;
 
-    @Column(nullable = false)
-    private Boolean projectVerified;
+    @ManyToOne
+    @JoinColumn(name = "verificationFacultyID", referencedColumnName = "id", nullable = false)
+    private User verificationFaculty;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "project_id")
-    private List<ProjectMember> projectMembers;
+    @Column(columnDefinition = "TEXT")
+    private String techStack;
 
-    @ElementCollection
-    @CollectionTable(name = "project_tags", joinColumns = @JoinColumn(name = "project_id"))
-    @Column(name = "tag")
-    private List<String> projectTags;
+    @Column(columnDefinition = "TEXT")
+    private String tags;
 
-    @Column(nullable = false)
-    private String projectStatus;
+    @Column
+    private Integer projectDurationMonths;
+
+    @Enumerated(EnumType.STRING)
+    private ProjectLevelEnum projectLevel;
+
+    @Enumerated(EnumType.STRING)
+    private ProjectStatusEnum projectStatus;
+
+    private Integer maxTeamSize;
 
     private String projectImage;
 
-    @ElementCollection
-    @CollectionTable(name = "project_tech_stack", joinColumns = @JoinColumn(name = "project_id"))
-    @Column(name = "tech")
-    private List<String> projectTechStack;
-
-    @ElementCollection
-    @CollectionTable(name = "project_prerequisites", joinColumns = @JoinColumn(name = "project_id"))
-    @Column(name = "prerequisite")
-    private List<String> projectPreRequisites;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "project_id")
-    private List<ProjectMilestone> projectMilestones;
-
     private String projectRepo;
 
-    @ManyToOne
-    @JoinColumn(name = "faculty_id")
-    private User faculty;
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectApplication> projectApplications;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectTeamMember> projectTeamMembers;
 
-
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectVerification> projectVerifications;
 }

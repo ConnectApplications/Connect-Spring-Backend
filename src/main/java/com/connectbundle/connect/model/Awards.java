@@ -14,23 +14,28 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_skills")
+@Table(name = "awards")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserSkill {
+@NoArgsConstructor
+public class Awards {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String skillName;
-
-    @Column(nullable = false)
-    private int proficiencyLevel;
-
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "recepient_id", referencedColumnName = "id", nullable = false)
     private User user;
+
+    @Column(nullable = false)
+    private String award_name;
+
+    @Column(nullable = false)
+    private Integer year;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String description;
+
 }

@@ -1,7 +1,13 @@
 package com.connectbundle.connect.model;
 
+import java.time.LocalDate;
+
+import com.connectbundle.connect.model.enums.ResearchProposalStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,23 +20,31 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "user_skills")
+@Table(name = "research_proposals")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSkill {
+public class ResearchProposals {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String skillName;
-
-    @Column(nullable = false)
-    private int proficiencyLevel;
+    private String title;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "submitted_by", referencedColumnName = "id", nullable = false)
+    private User submittedBy;
+
+    @Column(nullable = false)
+    private LocalDate submissionDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ResearchProposalStatus status;
+
+    @Column(nullable = false)
+    private Double fundingAmount;
 }
