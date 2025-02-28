@@ -70,4 +70,7 @@ public class WorkItem {
     @Column()
     private String achievement;
 
+    @Column()
+    private String category;
+
 }
