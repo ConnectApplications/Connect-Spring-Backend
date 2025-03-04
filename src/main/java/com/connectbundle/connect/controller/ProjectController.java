@@ -107,4 +107,10 @@ public class ProjectController {
         }
     }
 
+    @GetMapping("/getProjectsByUser/{userId}")
+    @Operation(summary = "Get Projects By User ID", description = "Retrieve all projects owned by a user")
+    public ResponseEntity<BaseResponse<List<ProjectResponseDTO>>> getProjectsByUser(@PathVariable Long userId) {
+        return projectService.getProjectsByUser(userId);
+    }
+
 }

@@ -103,6 +103,27 @@ public class ProjectService {
         }
     }
 
+    public ResponseEntity<BaseResponse<List<ProjectResponseDTO>>> getProjectsByUser(Long userId) {
+        Optional<User> user = userService.getUserByID(userId).getData() == null ? Optional.empty() : Optional.of(userService.getUserByID(userId).getData());
+
+        if (user.isEmpty()) {
+            return BaseResponse.error("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        List<Project> userProjects = projectRepository.findByOwnerId(user.get());
+
+        if (userProjects.isEmpty()) {
+            return BaseResponse.error("No projects found for this user", HttpStatus.NOT_FOUND);
+        }
+
+        List<ProjectResponseDTO> projectDTOs = userProjects.stream()
+                .map(project -> modelMapper.map(project, ProjectResponseDTO.class))
+                .toList();
+
+        return BaseResponse.success(projectDTOs, "Projects fetched successfully", projectDTOs.size());
+    }
+
+
     // RESPONSE CLASS
     @Getter
     public static class ProjectServiceResponse<T> {
