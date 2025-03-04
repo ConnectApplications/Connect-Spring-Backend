@@ -1,7 +1,10 @@
 package com.connectbundle.connect.dto.PostsDTO;
 
+import lombok.Data;
+
+@Data
 public class PostAuthorDTO {
-    private String name;
-    private String avatar;
-    private String role;
+    private String firstName;
+    private String profilePicture;
+    private String headline;
 }

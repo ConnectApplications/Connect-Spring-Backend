@@ -20,15 +20,15 @@ public class CommentService {
     @Autowired
     private PostsRepository postRepository;
 
-    public List<Comment> getCommentsByPostId(Long postId) {
+    public List<Comment> getCommentsByPostId(String postId) {
         return commentRepository.findByPostId(postId);
     }
 
-    public Optional<Comment> getCommentById(Long id) {
+    public Optional<Comment> getCommentById(String id) {
         return commentRepository.findById(id);
     }
 
-    public Comment addComment(Long postId, User user, String content) {
+    public Comment addComment(String postId, User user, String content) {
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
             throw new RuntimeException("Post not found");
@@ -41,7 +41,7 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public void deleteComment(Long id) {
+    public void deleteComment(String id) {
         commentRepository.deleteById(id);
     }
 }

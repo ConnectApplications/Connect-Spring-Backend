@@ -19,7 +19,7 @@ public class LikeService {
     @Autowired
     private PostsRepository postRepository;
 
-    public void likePost(Long postId, User user) {
+    public void likePost(String postId, User user) {
         Optional<Post> postOptional = postRepository.findById(postId);
         if (postOptional.isEmpty()) {
             throw new RuntimeException("Post not found");
@@ -36,12 +36,12 @@ public class LikeService {
         likeRepository.save(like);
     }
 
-    public void unlikePost(Long postId, User user) {
+    public void unlikePost(String postId, User user) {
         Optional<Like> likeOptional = likeRepository.findByPostIdAndUserId(postId, user.getId());
         likeOptional.ifPresent(likeRepository::delete);
     }
 
-    public int getLikeCount(Long postId) {
+    public int getLikeCount(String postId) {
         return likeRepository.countByPostId(postId);
     }
 }

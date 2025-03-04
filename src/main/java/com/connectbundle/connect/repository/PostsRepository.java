@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PostsRepository extends JpaRepository<Post, Long> {
+public interface PostsRepository extends JpaRepository<Post, String> {
 }
 
 

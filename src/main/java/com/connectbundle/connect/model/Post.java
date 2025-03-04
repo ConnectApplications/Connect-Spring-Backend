@@ -22,12 +22,11 @@ import java.util.List;
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @ManyToOne
     @JoinColumn(name="author_id",referencedColumnName = "id",nullable = false)
-    private User user;
+    private User author;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
