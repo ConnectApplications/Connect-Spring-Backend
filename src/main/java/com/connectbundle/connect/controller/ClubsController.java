@@ -39,8 +39,7 @@ public class ClubsController {
         try {
             ClubServiceResponse<List<Club>> clubServiceResponse = clubsService.getAllClubs();
             if (clubServiceResponse.isSuccess()) {
-                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(),
-                        HttpStatus.OK, clubServiceResponse.getData().size());
+                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(), clubServiceResponse.getData().size());
             } else {
                 return BaseResponse.error(clubServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -55,8 +54,7 @@ public class ClubsController {
         try {
             ClubServiceResponse<Club> clubServiceResponse = clubsService.getClubById(id);
             if (clubServiceResponse.isSuccess()) {
-                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(),
-                        HttpStatus.OK, 1);
+                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(), 1);
             } else {
                 return BaseResponse.error(clubServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -71,8 +69,7 @@ public class ClubsController {
         try {
             ClubServiceResponse<Club> clubServiceResponse = clubsService.createClub(club);
             if (clubServiceResponse.isSuccess()) {
-                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(),
-                        HttpStatus.OK, 0);
+                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(), 1);
             } else {
                 return BaseResponse.error(clubServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -87,8 +84,7 @@ public class ClubsController {
         try {
             ClubServiceResponse<Club> clubServiceResponse = clubsService.addMemberToClub(addClubMemberDTO);
             if (clubServiceResponse.isSuccess()) {
-                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(),
-                        HttpStatus.OK, 0);
+                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(), 1);
             } else {
                 return BaseResponse.error(clubServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -104,8 +100,7 @@ public class ClubsController {
         try {
             ClubServiceResponse<Club> clubServiceResponse = clubsService.removeMemberFromClub(removeClubMemberDTO);
             if (clubServiceResponse.isSuccess()) {
-                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(),
-                        HttpStatus.OK, 0);
+                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(), 1);
             } else {
                 return BaseResponse.error(clubServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }

@@ -34,8 +34,7 @@ public class AwardsController {
         try {
             AwardsService.AwardServiceResponse<List<Awards>> awardServiceResponse = awardsService.getAllAwards();
             if (awardServiceResponse.isSuccess()) {
-                return BaseResponse.success(awardServiceResponse.getData(), awardServiceResponse.getMessage(),
-                        HttpStatus.OK, awardServiceResponse.getData().size());
+                return BaseResponse.success(awardServiceResponse.getData(), awardServiceResponse.getMessage(), awardServiceResponse.getData().size());
             } else {
                 return BaseResponse.error(awardServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -50,8 +49,7 @@ public class AwardsController {
         try {
             AwardsService.AwardServiceResponse<Awards> awardServiceResponse = awardsService.createAward(award);
             if (awardServiceResponse.isSuccess()) {
-                return BaseResponse.success(awardServiceResponse.getData(), awardServiceResponse.getMessage(),
-                        HttpStatus.OK, 0);
+                return BaseResponse.success(awardServiceResponse.getData(), awardServiceResponse.getMessage(), 1);
             } else {
                 return BaseResponse.error(awardServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }

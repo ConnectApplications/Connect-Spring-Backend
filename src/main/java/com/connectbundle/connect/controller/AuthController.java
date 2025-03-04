@@ -47,7 +47,7 @@ public class AuthController {
         String role = check.getData(); // GET ROLE
         if (isValidLogin) {
             String token = jwtService.generateToken(loginRequest.getUsername(), role);
-            return BaseResponse.success(token, "Login Success", HttpStatus.OK, 0);
+            return BaseResponse.success(token, "Login Success", 1);
         }
         return BaseResponse.error("Incorrect username or password", HttpStatus.FORBIDDEN);
     }
@@ -58,7 +58,7 @@ public class AuthController {
     public ResponseEntity<BaseResponse<User>> registerUser(@Valid @RequestBody CreateUserDTO newUser) {
         try {
             User registeredUser = userService.registerUser(newUser);
-            return BaseResponse.success(registeredUser, "User registered Successfully", HttpStatus.OK, 0);
+            return BaseResponse.success(registeredUser, "User registered Successfully", 1);
         } catch (Exception e) {
             return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -72,7 +72,7 @@ public class AuthController {
             boolean success = sendOtpResponse.isSuccess();
             String message = sendOtpResponse.getMessage();
             if (success) {
-                return BaseResponse.success("", message, HttpStatus.OK, 0);
+                return BaseResponse.success("", message, 1);
             } else {
                 return BaseResponse.error(message, HttpStatus.NOT_ACCEPTABLE);
             }
@@ -90,7 +90,7 @@ public class AuthController {
             boolean success = validationResponse.isSuccess();
             String message = validationResponse.getMessage();
             if (success) {
-                return BaseResponse.success("", message, HttpStatus.OK, 0);
+                return BaseResponse.success("", message, 1);
             } else {
                 return BaseResponse.error(message, HttpStatus.NOT_ACCEPTABLE);
             }

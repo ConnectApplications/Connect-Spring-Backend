@@ -54,7 +54,7 @@ public class TestController {
         // Improved DB Health Check
         response.put("database", checkDatabaseHealth());
 
-        return BaseResponse.success(response, "Server health report", HttpStatus.OK, 0);
+        return BaseResponse.success(response, "Server health report",null);
     }
 
     private String checkDatabaseHealth() {

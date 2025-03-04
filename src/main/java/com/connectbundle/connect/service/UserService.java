@@ -2,11 +2,13 @@ package com.connectbundle.connect.service;
 
 import com.connectbundle.connect.dto.UserDTO.AddUserSkillDTO;
 import com.connectbundle.connect.dto.UserDTO.CreateUserDTO;
+import com.connectbundle.connect.model.Post;
 import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.model.UserSkill;
 import com.connectbundle.connect.model.enums.Role;
 import com.connectbundle.connect.repository.UserRepository;
 import lombok.Getter;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
     public UserServiceResponse<String> loginUser(String username, String password) {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isPresent()) {
@@ -36,7 +40,8 @@ public class UserService {
     }
 
     public User registerUser(CreateUserDTO user) {
-        User newUser = new User();
+
+        User newUser = modelMapper.map(user, User.class);
         newUser.setProfilePicture("");
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(newUser);
@@ -70,11 +75,7 @@ public class UserService {
     public UserServiceResponse<User> getUserByID(Long id) {
         try {
             Optional<User> optionalUser = userRepository.findById(id);
-            if (optionalUser.isPresent()) {
-                return new UserServiceResponse<>(true, "User fetched successfully", optionalUser.get());
-            } else {
-                return new UserServiceResponse<>(false, "User not found", null);
-            }
+            return optionalUser.map(user -> new UserServiceResponse<>(true, "User fetched successfully", user)).orElseGet(() -> new UserServiceResponse<>(false, "User not found", null));
         } catch (Exception e) {
             return new UserServiceResponse<>(false, e.getMessage(), null);
         }

@@ -12,20 +12,19 @@ import org.springframework.http.ResponseEntity;
 public class BaseResponse<T> {
     private T data;
     private String message;
-    private int status;
-    private String success;
-    private int count;
+    private Integer count;
 
-    public static <T> ResponseEntity<BaseResponse<T>> success(T data, String message, HttpStatus status,int count) {
-        return ResponseEntity.status(status)
-                .body(new BaseResponse<>(data, message, status.value(), "success", count));
+    public BaseResponse(String message) {
+        this.message = message;
     }
 
-    // do we need T here ?
+    public static <T> ResponseEntity<BaseResponse<T>> success(T data, String message, Integer count) {
+        BaseResponse<T> response = new BaseResponse<>(data, message, count);
+        return ResponseEntity.ok(response);
+    }
+
     public static <T> ResponseEntity<BaseResponse<T>> error(String message, HttpStatus status) {
-        return ResponseEntity.status(status)
-                .body(new BaseResponse<>(null, message, status.value(), "Error", 0));
+        BaseResponse<T> response = new BaseResponse<>(message);
+        return ResponseEntity.status(status).body(response);
     }
-
-
 }

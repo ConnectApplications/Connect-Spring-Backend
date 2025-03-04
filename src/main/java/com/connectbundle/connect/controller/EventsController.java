@@ -36,8 +36,7 @@ public class EventsController {
         try {
             EventServiceResponse<List<Event>> allEvents = eventService.getAllEvents();
             if (allEvents.isSuccess()) {
-                return BaseResponse.success(allEvents.getData(), allEvents.getMessage(), HttpStatus.OK,
-                        allEvents.getData().size());
+                return BaseResponse.success(allEvents.getData(), allEvents.getMessage(), allEvents.getData().size());
             } else {
                 return BaseResponse.error(allEvents.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -53,8 +52,7 @@ public class EventsController {
         try {
             EventServiceResponse<Event> eventServiceResponse = eventService.createEvent(createEvent);
             if (eventServiceResponse.isSuccess()) {
-                return BaseResponse.success(eventServiceResponse.getData(), eventServiceResponse.getMessage(),
-                        HttpStatus.CREATED, 1);
+                return BaseResponse.success(eventServiceResponse.getData(), eventServiceResponse.getMessage(), 1);
             } else {
                 return BaseResponse.error(eventServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }

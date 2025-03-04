@@ -12,7 +12,7 @@ public class PostResponseDTO {
     private Boolean isLiked;
     private Boolean IsBookmarked;
     private PostAuthorDTO author;
-    private Object media; //
+    private PostMediaDTO media;
     private String[] tags;
     private CommentResponseDTO[] commentList;
 

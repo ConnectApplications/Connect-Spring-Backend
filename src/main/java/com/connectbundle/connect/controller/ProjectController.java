@@ -2,6 +2,7 @@ package com.connectbundle.connect.controller;
 
 import java.util.List;
 
+import com.connectbundle.connect.dto.ProjectsDTO.ProjectResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +30,12 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/project")
 @Tag(name = "Project", description = "Project Endpoints")
 public class ProjectController {
+    private final ProjectService projectService;
 
     @Autowired
-    ProjectService projectService;
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
+    }
 
     @GetMapping("/getProject/{id}")
     @Operation(summary = "Get Project By ID", description = "Retrieve a project by its ID")
@@ -42,7 +46,7 @@ public class ProjectController {
             if (success) {
                 Project project = projectServiceResponse.getData();
                 String message = projectServiceResponse.getMessage();
-                return BaseResponse.success(project, message, HttpStatus.OK, 0);
+                return BaseResponse.success(project, message, 1);
             }
             return BaseResponse.error(projectServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
@@ -52,19 +56,8 @@ public class ProjectController {
 
     @PostMapping("/createProject")
     @Operation(summary = "Create Project", description = "Create a new project")
-    public ResponseEntity<BaseResponse<Project>> createProject(@Valid @RequestBody CreateProjectDTO project) {
-        try {
-            ProjectServiceResponse<Project> createdProject = projectService.createProject(project);
-            boolean success = createdProject.isSuccess();
-            String message = createdProject.getMessage();
-            if (success) {
-                return BaseResponse.success(createdProject.getData(), message, HttpStatus.OK, 0);
-            } else {
-                return BaseResponse.error(message, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> createProject(@Valid @RequestBody CreateProjectDTO projectDTO) {
+        return projectService.createProject(projectDTO);
     }
 
     @PostMapping("/uploadProjectImage/{id}")
@@ -79,7 +72,7 @@ public class ProjectController {
                 Project project = projectServiceResponse.getData();
                 ProjectServiceResponse<Void> uploadedImage = projectService.uploadProjectImage(file, project);
                 if (uploadedImage.isSuccess()) {
-                    return BaseResponse.success(null, uploadedImage.getMessage(), HttpStatus.OK, 0);
+                    return BaseResponse.success(null, uploadedImage.getMessage(), null);
                 } else {
                     return BaseResponse.error(uploadedImage.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
                 }
@@ -93,19 +86,8 @@ public class ProjectController {
 
     @GetMapping("/getAllProjects")
     @Operation(summary = "Get All Projects", description = "Retrieve a list of all projects")
-    public ResponseEntity<BaseResponse<List<Project>>> getAllProjects() {
-        try {
-            ProjectServiceResponse<List<Project>> allProjects = projectService.getAllProjects();
-            boolean success = allProjects.isSuccess();
-            String message = allProjects.getMessage();
-            if (success) {
-                return BaseResponse.success(allProjects.getData(), message, HttpStatus.OK, 0);
-            } else {
-                return BaseResponse.error(message, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<BaseResponse<List<ProjectResponseDTO>>> getAllProjects() {
+        return projectService.getAllProjects();
     }
 
     @DeleteMapping("/deleteProject/{id}")
@@ -116,7 +98,7 @@ public class ProjectController {
             boolean success = deletedProject.isSuccess();
             String message = deletedProject.getMessage();
             if (success) {
-                return BaseResponse.success(deletedProject.getData(), message, HttpStatus.OK, 0);
+                return BaseResponse.success(deletedProject.getData(), message, 1);
             } else {
                 return BaseResponse.error(message, HttpStatus.INTERNAL_SERVER_ERROR);
             }

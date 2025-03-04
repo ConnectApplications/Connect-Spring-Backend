@@ -2,20 +2,12 @@ package com.connectbundle.connect.model;
 
 import java.util.List;
 
+import com.connectbundle.connect.model.enums.PostTypeEnum;
+import com.connectbundle.connect.model.enums.PostVisibilityEnum;
 import com.connectbundle.connect.model.enums.ProjectLevelEnum;
 import com.connectbundle.connect.model.enums.ProjectStatusEnum;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -39,15 +31,19 @@ public class Project {
     @Column(columnDefinition = "TEXT")
     private String projectDescription;
 
+    @ManyToOne
+    @JoinColumn(name = "ownerId", referencedColumnName = "id", nullable = false)
+    private User ownerId;
+
     @Column(columnDefinition = "TEXT")
     private String prerequisites;
 
     @ManyToOne
-    @JoinColumn(name = "facultyMentorID", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "facultyMentorId", referencedColumnName = "id", nullable = true)
     private User facultyMentor;
 
     @ManyToOne
-    @JoinColumn(name = "verificationFacultyID", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "verificationFacultyId", referencedColumnName = "id", nullable = true)
     private User verificationFaculty;
 
     @Column(columnDefinition = "TEXT")
@@ -65,7 +61,7 @@ public class Project {
     @Enumerated(EnumType.STRING)
     private ProjectStatusEnum projectStatus;
 
-    private Integer maxTeamSize;
+    //private Integer maxTeamSize;
 
     private String projectImage;
 
@@ -79,4 +75,14 @@ public class Project {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectVerification> projectVerifications;
+
+    @PrePersist
+    public void setDefaults() {
+        if (this.projectLevel == null) {
+            this.projectLevel = ProjectLevelEnum.EASY;
+        }
+        if (this.projectStatus  == null) {
+            this.projectStatus = ProjectStatusEnum.NOT_STARTED;
+        }
+    }
 }
