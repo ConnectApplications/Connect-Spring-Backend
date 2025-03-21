@@ -1,8 +1,11 @@
 package com.connectbundle.connect.service;
 
+import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.UserDTO.AddUserSkillDTO;
 import com.connectbundle.connect.dto.UserDTO.CreateUserDTO;
-import com.connectbundle.connect.model.Post;
+import com.connectbundle.connect.dto.UserDTO.UserResponseDTO;
+import com.connectbundle.connect.exception.ResourceAlreadyExistsException;
+
 import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.model.UserSkill;
 import com.connectbundle.connect.model.enums.Role;
@@ -10,6 +13,7 @@ import com.connectbundle.connect.repository.UserRepository;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,13 +43,21 @@ public class UserService {
         return new UserServiceResponse<>(false, "", null);
     }
 
-    public User registerUser(CreateUserDTO user) {
-
-        User newUser = modelMapper.map(user, User.class);
-        newUser.setProfilePicture("");
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(newUser);
+    public ResponseEntity<BaseResponse<UserResponseDTO>> registerUser(CreateUserDTO userDTO) {
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            throw new ResourceAlreadyExistsException("User", "username", userDTO.getUsername());
+        }
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new ResourceAlreadyExistsException("User", "email", userDTO.getEmail());
+        }
+        User newUser = modelMapper.map(userDTO, User.class);
+        newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        User savedUser = userRepository.save(newUser);
+        UserResponseDTO userResponseDTO = modelMapper.map(savedUser, UserResponseDTO.class);
+        return BaseResponse.success(userResponseDTO, "User registered successfully", 1);
     }
+
+
 
     public UserServiceResponse<Void> uploadUserImage(MultipartFile file, User user) {
         try {

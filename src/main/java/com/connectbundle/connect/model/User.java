@@ -4,17 +4,7 @@ import java.util.List;
 
 import com.connectbundle.connect.model.enums.Role;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,7 +40,7 @@ public class User {
     private String currentPosition;
 
     @Enumerated(EnumType.STRING)
-    private Role role; // STUDENT, FACULTY, ADMIN
+    private Role role; // Default STUDENT, FACULTY, ADMIN
 
     private boolean isActive;
 
@@ -80,4 +70,12 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClubMember> clubs;
+
+    @PrePersist
+    public void setDefaults() {
+        if (this.role == null) {
+            this.role = Role.STUDENT;
+        }
+
+    }
 }

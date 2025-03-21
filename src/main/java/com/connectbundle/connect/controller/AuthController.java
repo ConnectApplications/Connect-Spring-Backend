@@ -1,5 +1,6 @@
 package com.connectbundle.connect.controller;
 
+import com.connectbundle.connect.dto.UserDTO.UserResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,13 +56,9 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "Register User", description = "Register a new user")
     // TODO : EXTRACT IMAGE TO USE FOR PFP AND SAVE
-    public ResponseEntity<BaseResponse<User>> registerUser(@Valid @RequestBody CreateUserDTO newUser) {
-        try {
-            User registeredUser = userService.registerUser(newUser);
-            return BaseResponse.success(registeredUser, "User registered Successfully", 1);
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<BaseResponse<UserResponseDTO>> registerUser(@Valid @RequestBody CreateUserDTO newUser) {
+         return userService.registerUser(newUser);
+
     }
 
     @PostMapping("/send-otp")

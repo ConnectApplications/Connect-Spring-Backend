@@ -37,6 +37,14 @@ public class GlobalExceptionHandler  {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleResourceAlreadyExistsException(ResourceAlreadyExistsException e) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Resource Already Exists");
+        response.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRunTimeException(RuntimeException e) {
         Map<String, String> response = new HashMap<>();
