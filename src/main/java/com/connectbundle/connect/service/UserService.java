@@ -1,11 +1,14 @@
 package com.connectbundle.connect.service;
 
+import com.connectbundle.connect.dto.AuthDTO.LoginRequest;
+import com.connectbundle.connect.dto.AuthDTO.LoginResponseDTO;
 import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.UserDTO.AddUserSkillDTO;
 import com.connectbundle.connect.dto.UserDTO.CreateUserDTO;
 import com.connectbundle.connect.dto.UserDTO.UserResponseDTO;
 import com.connectbundle.connect.exception.ResourceAlreadyExistsException;
 
+import com.connectbundle.connect.exception.ResourceNotFoundException;
 import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.model.UserSkill;
 import com.connectbundle.connect.model.enums.Role;
@@ -13,6 +16,7 @@ import com.connectbundle.connect.repository.UserRepository;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,16 +35,23 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    JWTService jwtService;
+
+    @Autowired
     private ModelMapper modelMapper;
-    public UserServiceResponse<String> loginUser(String username, String password) {
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            boolean passwordCheck = passwordEncoder.matches(password, user.getPassword());
-            Role role = user.getRole();
-            return new UserServiceResponse<>(passwordCheck, "Login Success", role.toString());
+
+
+    public ResponseEntity<BaseResponse<LoginResponseDTO>> loginUser(LoginRequest loginRequestDTO) {
+        User user = userRepository.findByUsername(loginRequestDTO.getUsername())
+                        .orElseThrow(() -> new ResourceNotFoundException("User", "Username", loginRequestDTO.getUsername()));
+
+        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
+            return BaseResponse.error("Incorrect password", HttpStatus.UNAUTHORIZED);
         }
-        return new UserServiceResponse<>(false, "", null);
+        String token = jwtService.generateToken(user.getUsername(), user.getRole().toString());
+        UserResponseDTO responseUser = modelMapper.map(user, UserResponseDTO.class);
+        LoginResponseDTO responseDTO = new LoginResponseDTO(responseUser, token);
+        return BaseResponse.success(responseDTO, "Login Success", 1);
     }
 
     public ResponseEntity<BaseResponse<UserResponseDTO>> registerUser(CreateUserDTO userDTO) {

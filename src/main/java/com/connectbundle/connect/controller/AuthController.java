@@ -1,5 +1,6 @@
 package com.connectbundle.connect.controller;
 
+import com.connectbundle.connect.dto.AuthDTO.LoginResponseDTO;
 import com.connectbundle.connect.dto.UserDTO.UserResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,25 +34,17 @@ public class AuthController {
     @Autowired
     UserService userService;
 
-    @Autowired
-    JWTService jwtService;
+
 
     @Autowired
     EmailService emailService;
 
     @PostMapping("/login")
     @Operation(summary = "Login User", description = "Authenticate user and return JWT token")
-    public ResponseEntity<BaseResponse<String>> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
-        UserServiceResponse<String> check = userService.loginUser(loginRequest.getUsername(),
-                loginRequest.getPassword());
-        boolean isValidLogin = check.isSuccess();
-        String role = check.getData(); // GET ROLE
-        if (isValidLogin) {
-            String token = jwtService.generateToken(loginRequest.getUsername(), role);
-            return BaseResponse.success(token, "Login Success", 1);
-        }
-        return BaseResponse.error("Incorrect username or password", HttpStatus.FORBIDDEN);
+    public ResponseEntity<BaseResponse<LoginResponseDTO>> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
+        return userService.loginUser(loginRequest);
     }
+
 
     @PostMapping("/register")
     @Operation(summary = "Register User", description = "Register a new user")
