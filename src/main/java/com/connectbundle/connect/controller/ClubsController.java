@@ -63,19 +63,10 @@ public class ClubsController {
         }
     }
 
-    @PostMapping("/createClub")
+    @PostMapping
     @Operation(summary = "Create Club", description = "Create a new club")
     public ResponseEntity<BaseResponse<Club>> createClub(@Valid @RequestBody CreateClubDTO club) {
-        try {
-            ClubServiceResponse<Club> clubServiceResponse = clubsService.createClub(club);
-            if (clubServiceResponse.isSuccess()) {
-                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(), 1);
-            } else {
-                return BaseResponse.error(clubServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return clubsService.createClub(club);
     }
 
     @PostMapping("/addMember")

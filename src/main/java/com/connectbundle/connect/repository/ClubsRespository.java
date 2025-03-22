@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.connectbundle.connect.model.Club;
 
-public interface ClubsRespository extends JpaRepository<Club, Long> {
+import java.util.Optional;
 
+public interface ClubsRespository extends JpaRepository<Club, Long> {
+    Optional<Club> findByClubName(String clubName);
 }

@@ -2,7 +2,11 @@ package com.connectbundle.connect.service;
 
 import java.util.List;
 
+import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.exception.ResourceAlreadyExistsException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.connectbundle.connect.dto.ClubsDTO.AddClubMemberDTO;
@@ -30,18 +34,18 @@ public class ClubsService {
     @Autowired
     ClubMemberRepository clubMemberRepository;
 
-    public ClubServiceResponse<Club> createClub(CreateClubDTO club) {
-        try {
-            Club newClub = new Club();
-            newClub.setClub_name(club.getClubName());
-            newClub.setActivities(club.getActivities());
-            newClub.setMembers_count(0);
-            clubsRespository.save(newClub);
-            return new ClubServiceResponse<>(true, "Club saved successfully", newClub);
-        } catch (Exception e) {
-            return new ClubServiceResponse<>(false, e.getMessage(), null);
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public ResponseEntity<BaseResponse<Club>> createClub(CreateClubDTO clubDTO) {
+        if (clubsRespository.findByClubName(clubDTO.getClubName()).isPresent()) {
+            throw new ResourceAlreadyExistsException("Club", "name", clubDTO.getClubName());
         }
-    }
+        Club club = modelMapper.map(clubDTO, Club.class);
+        club.setMembers_count(0);
+        clubsRespository.save(club);
+        return BaseResponse.success(club, "Club saved successfully", 1);
+}
 
     public ClubServiceResponse<List<Club>> getAllClubs() {
         try {

@@ -28,7 +28,7 @@ public class Club {
     private Long id;
 
     @Column(nullable = false)
-    private String club_name;
+    private String clubName;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String activities;
