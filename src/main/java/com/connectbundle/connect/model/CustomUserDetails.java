@@ -1,13 +1,16 @@
 package com.connectbundle.connect.model;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
+
 
     public CustomUserDetails(User user) {
         this.user = user;
@@ -15,8 +18,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole())); // Ensure user has a `getRole()` method
     }
 
     @Override

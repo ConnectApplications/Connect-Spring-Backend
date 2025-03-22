@@ -4,6 +4,7 @@ import com.connectbundle.connect.service.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -31,22 +32,36 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(customizer -> customizer.disable()).authorizeHttpRequests(request -> request
-                .requestMatchers(
-                        "/api/auth/**",
-                        "/api/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**",
-                        "/webjars/**")
-                .permitAll()
-                .anyRequest().authenticated())
-//                .oauth2Login(Customizer.withDefaults())
+        return http.csrf(customizer -> customizer.disable())
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/test",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/webjars/**")
+                        .permitAll()
+                        .anyRequest().authenticated()
+                )
+                .authenticationProvider(authenticationProvider())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value()); // 401
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized access. Please login.\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpStatus.FORBIDDEN.value()); // 403
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Access denied. You do not have permission.\"}");
+                        })
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-
     }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

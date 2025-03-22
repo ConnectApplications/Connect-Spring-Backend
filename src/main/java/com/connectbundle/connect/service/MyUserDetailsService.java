@@ -16,6 +16,7 @@ import com.connectbundle.connect.repository.UserRepository;
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
+
     @Autowired
     UserRepository userRepository;
 
@@ -28,5 +29,7 @@ public class MyUserDetailsService implements UserDetailsService {
         }
         return new CustomUserDetails(user.get());
     }
+
+
 }
 
