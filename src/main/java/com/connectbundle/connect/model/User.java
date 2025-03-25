@@ -69,7 +69,10 @@ public class User {
     private List<Event> eventsOrganized;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ClubMember> clubs;
+    private List<ClubMember> clubMemberships;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OfficeBearer> officeBearerRoles;
 
     @PrePersist
     public void setDefaults() {

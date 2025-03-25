@@ -7,5 +7,5 @@ import com.connectbundle.connect.model.Club;
 import java.util.Optional;
 
 public interface ClubsRespository extends JpaRepository<Club, Long> {
-    Optional<Club> findByClubName(String clubName);
+    Optional<Club> findByName(String name);
 }

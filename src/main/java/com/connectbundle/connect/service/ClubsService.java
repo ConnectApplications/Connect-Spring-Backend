@@ -38,14 +38,23 @@ public class ClubsService {
     private ModelMapper modelMapper;
 
     public ResponseEntity<BaseResponse<Club>> createClub(CreateClubDTO clubDTO) {
-        if (clubsRespository.findByClubName(clubDTO.getClubName()).isPresent()) {
-            throw new ResourceAlreadyExistsException("Club", "name", clubDTO.getClubName());
+        if (clubsRespository.findByName(clubDTO.getName()).isPresent()) {
+            throw new ResourceAlreadyExistsException("Club", "name", clubDTO.getName());
         }
+        User advisor = clubDTO.getAdvisor() != null
+                ? userRepository.findByUsername(clubDTO.getAdvisor()).orElse(null)
+                : null;
+
+        User clubHead = userRepository.findByUsername(clubDTO.getClubHead())
+                .orElseThrow(() -> new RuntimeException("Club head not found"));
+
         Club club = modelMapper.map(clubDTO, Club.class);
+        club.setAdvisor(advisor);
+        club.setClubHead(clubHead);
         club.setMembers_count(0);
         clubsRespository.save(club);
         return BaseResponse.success(club, "Club saved successfully", 1);
-}
+    }
 
     public ClubServiceResponse<List<Club>> getAllClubs() {
         try {

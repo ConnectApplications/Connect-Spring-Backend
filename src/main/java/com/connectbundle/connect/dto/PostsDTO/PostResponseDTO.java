@@ -24,7 +24,7 @@ public class PostResponseDTO {
     private String createdAt;
     private Long likes;
     private Long comments;
-    private Boolean isLiked;
+    private Boolean isLikedByUser;
     private Boolean isBookmarked;
     private PostAuthorDTO author;
     private PostMediaDTO media;
