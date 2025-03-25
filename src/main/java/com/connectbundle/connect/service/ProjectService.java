@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.ProjectsDTO.ProjectResponseDTO;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import com.connectbundle.connect.repository.ProjectRepository;
 
 import lombok.Getter;
 
+@Transactional
 @Service
 public class ProjectService {
     private final ProjectRepository projectRepository;

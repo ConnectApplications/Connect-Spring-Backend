@@ -48,7 +48,7 @@ public class UserService {
         if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
             return BaseResponse.error("Incorrect password", HttpStatus.UNAUTHORIZED);
         }
-        String token = jwtService.generateToken(user.getUsername(), user.getRole().toString());
+        String token = jwtService.generateToken(user, user.getRole().toString());
         UserResponseDTO responseUser = modelMapper.map(user, UserResponseDTO.class);
         LoginResponseDTO responseDTO = new LoginResponseDTO(responseUser, token);
         return BaseResponse.success(responseDTO, "Login Success", 1);

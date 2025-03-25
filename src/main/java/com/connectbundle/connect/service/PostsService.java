@@ -16,7 +16,10 @@ import com.connectbundle.connect.repository.UserRepository;
 import jakarta.persistence.PrePersist;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
@@ -53,13 +56,30 @@ public class PostsService {
         return BaseResponse.success(postResponseDTOS, "Posts fetched successfully", postResponseDTOS.size());
 
     }
-//    public Optional<Post> getPostByUserId(Long id){
-//        return postsRepository.findById(id);
-//    }
-    public ResponseEntity<BaseResponse<PostResponseDTO>> createPost(CreatePostDTO postDTO) throws NoSuchAlgorithmException {
-        User user = userRepository.findById(postDTO.getAuthor_id())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "ID", postDTO.getAuthor_id()));
+    public ResponseEntity<BaseResponse<List<PostResponseDTO>>> getPostByUserId(Long id){
+        List<Post> posts = postsRepository.findByAuthorId(id);
+        List<PostResponseDTO> postResponseDTOS = posts.stream()
+                .map(post -> {
+                    PostResponseDTO postDTO = modelMapper.map(post, PostResponseDTO.class);
 
+                    PostAuthorDTO authorDTO = modelMapper.map(post.getAuthor(), PostAuthorDTO.class);
+
+                    postDTO.setAuthor(authorDTO);
+
+                    return postDTO;
+                })
+                .toList();
+        return BaseResponse.success(postResponseDTOS,"Posts fetched successfully",postResponseDTOS.size());
+    }
+    public ResponseEntity<BaseResponse<PostResponseDTO>> createPost(CreatePostDTO postDTO) throws NoSuchAlgorithmException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authentication: " + authentication);
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return BaseResponse.error("Unauthorized access", HttpStatus.UNAUTHORIZED);
+        }
+        String username = authentication.getName(); // This is usually the email or username
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
 
         Post post = modelMapper.map(postDTO, Post.class);
         post.setId(idGenerator.generateUniqueId(user.getEmail()));

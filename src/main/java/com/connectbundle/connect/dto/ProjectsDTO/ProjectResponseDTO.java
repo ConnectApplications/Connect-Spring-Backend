@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,8 +19,8 @@ public class ProjectResponseDTO {
     private String projectDescription;
     private Long ownerId;
     private String prerequisites;
-    private String techStack;
-    private String tags;
+    private List<String> techStack;
+    private List<String> tags;
     private Integer projectDurationMonths;
     private ProjectLevelEnum projectLevel;
     private ProjectStatusEnum projectStatus;

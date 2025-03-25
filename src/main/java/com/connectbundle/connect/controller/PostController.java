@@ -37,11 +37,11 @@ public class PostController {
         return postService.getAllPosts();
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
-//        Optional<Post> post = postService.getPostByUserId(id);
-//        return post.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-//    }
+    @GetMapping("/user/{id}")
+    public ResponseEntity<BaseResponse<List<PostResponseDTO>>>  getPostById(@PathVariable Long id) {
+        return postService.getPostByUserId(id);
+
+    }
 
     @PostMapping
     public ResponseEntity<BaseResponse<PostResponseDTO>> createPost(@Valid @RequestBody CreatePostDTO postDTO) throws NoSuchAlgorithmException {

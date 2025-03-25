@@ -23,6 +23,11 @@ public class BaseResponse<T> {
         return ResponseEntity.ok(response);
     }
 
+    public static ResponseEntity<BaseResponse<Void>> successMessage(String message) {
+        BaseResponse<Void> response = new BaseResponse<>(message);
+        return ResponseEntity.ok(response);
+    }
+
     public static <T> ResponseEntity<BaseResponse<T>> error(String message, HttpStatus status) {
         BaseResponse<T> response = new BaseResponse<>(message);
         return ResponseEntity.status(status).body(response);

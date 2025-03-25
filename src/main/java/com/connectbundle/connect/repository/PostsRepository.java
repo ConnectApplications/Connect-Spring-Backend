@@ -11,6 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface PostsRepository extends JpaRepository<Post, String> {
+
+    List<Post> findByAuthorId(Long authorId);
 }
 
 
