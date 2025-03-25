@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -26,8 +28,8 @@ public class PostResponseDTO {
     private Boolean isBookmarked;
     private PostAuthorDTO author;
     private PostMediaDTO media;
-    private String[] tags;
-    private CommentResponseDTO[] commentList;
+    private List<String> tags;
+    private List<CommentResponseDTO> commentList;
 
 
 }

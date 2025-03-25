@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,7 +41,7 @@ public class Post {
     private PostVisibilityEnum visibility = PostVisibilityEnum.PUBLIC;
 
     @Column
-    private String[] tags;
+    private List<String> tags = new ArrayList<>();
     @Column
     private String media;
 
