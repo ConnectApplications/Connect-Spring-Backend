@@ -21,7 +21,7 @@ public class PostResponseDTO {
     private String type;
     private String visibility;
     private String content;
-    private String timestamp;
+    private String createdAt;
     private Long likes;
     private Long comments;
     private Boolean isLiked;

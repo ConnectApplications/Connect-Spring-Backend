@@ -13,8 +13,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatePostDTO {
-    @NotNull(message = "Post Author is required")
-    private Long author_id;
     @NotBlank(message = "Post Content is required")
     private String content;
     @NotNull(message = "Post Type is required")

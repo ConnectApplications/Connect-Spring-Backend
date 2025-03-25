@@ -56,8 +56,10 @@ public class PostsService {
         return BaseResponse.success(postResponseDTOS, "Posts fetched successfully", postResponseDTOS.size());
 
     }
-    public ResponseEntity<BaseResponse<List<PostResponseDTO>>> getPostByUserId(Long id){
-        List<Post> posts = postsRepository.findByAuthorId(id);
+    public ResponseEntity<BaseResponse<List<PostResponseDTO>>> getPostByUser(String username){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
+        List<Post> posts = postsRepository.findByAuthorId(user.getId());
         List<PostResponseDTO> postResponseDTOS = posts.stream()
                 .map(post -> {
                     PostResponseDTO postDTO = modelMapper.map(post, PostResponseDTO.class);
@@ -73,11 +75,11 @@ public class PostsService {
     }
     public ResponseEntity<BaseResponse<PostResponseDTO>> createPost(CreatePostDTO postDTO) throws NoSuchAlgorithmException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authentication: " + authentication);
+
         if (authentication == null || !authentication.isAuthenticated()) {
             return BaseResponse.error("Unauthorized access", HttpStatus.UNAUTHORIZED);
         }
-        String username = authentication.getName(); // This is usually the email or username
+        String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
 

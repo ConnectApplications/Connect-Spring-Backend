@@ -37,10 +37,9 @@ public class PostController {
         return postService.getAllPosts();
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<BaseResponse<List<PostResponseDTO>>>  getPostById(@PathVariable Long id) {
-        return postService.getPostByUserId(id);
-
+    @GetMapping("/user/{username}")
+    public ResponseEntity<BaseResponse<List<PostResponseDTO>>>  getPostByUser(@PathVariable String username) {
+        return postService.getPostByUser(username);
     }
 
     @PostMapping
