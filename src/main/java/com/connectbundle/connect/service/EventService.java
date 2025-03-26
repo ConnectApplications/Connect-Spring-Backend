@@ -32,25 +32,25 @@ public class EventService {
 
     }
 
-    public EventServiceResponse<Event> createEvent(CreateEventDTO createEventDTO) {
-        try {
-            UserServiceResponse<User> eventOwner = userService.getUserByUsername(createEventDTO.getUsername());
-            if (eventOwner.isSuccess()) {
-                Event newEvent = new Event();
-                newEvent.setUser(eventOwner.getData());
-                newEvent.setEvent_name(createEventDTO.getEventName());
-                newEvent.setLocation(createEventDTO.getLocation());
-                newEvent.setDescription(createEventDTO.getDescription());
-                newEvent.setDate(java.time.LocalDate.parse(createEventDTO.getDate()));
-                eventRepository.save(newEvent);
-                return new EventServiceResponse<>(true, "Event saved successfully", newEvent);
-            } else {
-                return new EventServiceResponse<>(false, "User not found", null);
-            }
-        } catch (Exception e) {
-            return new EventServiceResponse<>(false, e.getMessage(), null);
-        }
-    }
+//    public EventServiceResponse<Event> createEvent(CreateEventDTO createEventDTO) {
+//        try {
+//            UserServiceResponse<User> eventOwner = userService.getUserByUsername(createEventDTO.getUsername());
+//            if (eventOwner.isSuccess()) {
+//                Event newEvent = new Event();
+//                newEvent.setUser(eventOwner.getData());
+//                newEvent.setEvent_name(createEventDTO.getEventName());
+//                newEvent.setLocation(createEventDTO.getLocation());
+//                newEvent.setDescription(createEventDTO.getDescription());
+//                newEvent.setDate(java.time.LocalDate.parse(createEventDTO.getDate()));
+//                eventRepository.save(newEvent);
+//                return new EventServiceResponse<>(true, "Event saved successfully", newEvent);
+//            } else {
+//                return new EventServiceResponse<>(false, "User not found", null);
+//            }
+//        } catch (Exception e) {
+//            return new EventServiceResponse<>(false, e.getMessage(), null);
+//        }
+//    }
 
     // RESPONSE CLASS
     @Getter

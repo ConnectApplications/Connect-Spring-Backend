@@ -1,5 +1,6 @@
 package com.connectbundle.connect.controller;
 
+import com.connectbundle.connect.dto.UserDTO.UserResponseDTO;
 import com.connectbundle.connect.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,44 +35,35 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/getUser/{username}")
+
+
+    @GetMapping("/{username}")
     @Operation(summary = "Get User By Username", description = "Fetch user by username")
-    public ResponseEntity<BaseResponse<User>> getUserByUsername(@PathVariable String username) {
-        try {
-            UserServiceResponse<User> userResponse = userService.getUserByUsername(username);
+    public ResponseEntity<BaseResponse<UserResponseDTO>> getUserByUsername(@PathVariable String username) {
+        return  userService.getUserByUsername(username);
 
-            if (!userResponse.isSuccess() || userResponse.getData() == null) {
-                throw new ResourceNotFoundException("User", "username", username);
-            }
-
-            return BaseResponse.success(userResponse.getData(), userResponse.getMessage(),null);
-        } catch (ResourceNotFoundException e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return BaseResponse.error("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
 
-    @PostMapping("/uploadProfilePicture/{username}")
-    @Operation(summary = "Upload Profile Picture", description = "Update or upload user's profile picture by their username")
-    public ResponseEntity<BaseResponse<Void>> uploadUserProfilePicture(
-            @RequestParam("file") MultipartFile file,
-            @PathVariable String username) {
-
-        UserServiceResponse<User> userResponse = userService.getUserByUsername(username);
-
-        if (!userResponse.isSuccess() || userResponse.getData() == null) {
-            throw new ResourceNotFoundException("User", "username", username);
-        }
-
-        User user = userResponse.getData();
-        UserServiceResponse<Void> uploadResponse = userService.uploadUserImage(file, user);
-
-        return uploadResponse.isSuccess()
-                ? BaseResponse.success(null, uploadResponse.getMessage(),null)
-                : BaseResponse.error(uploadResponse.getMessage(), HttpStatus.BAD_REQUEST);
-    }
+//    @PostMapping("/uploadProfilePicture/{username}")
+//    @Operation(summary = "Upload Profile Picture", description = "Update or upload user's profile picture by their username")
+//    public ResponseEntity<BaseResponse<Void>> uploadUserProfilePicture(
+//            @RequestParam("file") MultipartFile file,
+//            @PathVariable String username) {
+//
+//        UserServiceResponse<User> userResponse = userService.getUserByUsername(username);
+//
+//        if (!userResponse.isSuccess() || userResponse.getData() == null) {
+//            throw new ResourceNotFoundException("User", "username", username);
+//        }
+//
+//        User user = userResponse.getData();
+//        UserServiceResponse<Void> uploadResponse = userService.uploadUserImage(file, user);
+//
+//        return uploadResponse.isSuccess()
+//                ? BaseResponse.success(null, uploadResponse.getMessage(),null)
+//                : BaseResponse.error(uploadResponse.getMessage(), HttpStatus.BAD_REQUEST);
+//    }
 
     @DeleteMapping("/deleteUser/{username}")
     @Operation(summary = "Delete User", description = "Delete user by username")

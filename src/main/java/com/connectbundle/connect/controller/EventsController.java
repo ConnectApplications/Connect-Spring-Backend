@@ -46,18 +46,18 @@ public class EventsController {
     }
 
     // Create An Event
-    @PostMapping()
-    @Operation(summary = "Create Event", description = "Create a new event")
-    public ResponseEntity<BaseResponse<Event>> createEvent(@Valid @RequestBody CreateEventDTO createEvent) {
-        try {
-            EventServiceResponse<Event> eventServiceResponse = eventService.createEvent(createEvent);
-            if (eventServiceResponse.isSuccess()) {
-                return BaseResponse.success(eventServiceResponse.getData(), eventServiceResponse.getMessage(), 1);
-            } else {
-                return BaseResponse.error(eventServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @PostMapping()
+//    @Operation(summary = "Create Event", description = "Create a new event")
+//    public ResponseEntity<BaseResponse<Event>> createEvent(@Valid @RequestBody CreateEventDTO createEvent) {
+//        try {
+//            EventServiceResponse<Event> eventServiceResponse = eventService.createEvent(createEvent);
+//            if (eventServiceResponse.isSuccess()) {
+//                return BaseResponse.success(eventServiceResponse.getData(), eventServiceResponse.getMessage(), 1);
+//            } else {
+//                return BaseResponse.error(eventServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        } catch (Exception e) {
+//            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 }

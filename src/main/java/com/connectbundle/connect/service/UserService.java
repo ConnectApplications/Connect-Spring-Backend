@@ -3,12 +3,15 @@ package com.connectbundle.connect.service;
 import com.connectbundle.connect.dto.AuthDTO.LoginRequest;
 import com.connectbundle.connect.dto.AuthDTO.LoginResponseDTO;
 import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.dto.PostsDTO.PostAuthorDTO;
+import com.connectbundle.connect.dto.PostsDTO.PostResponseDTO;
 import com.connectbundle.connect.dto.UserDTO.AddUserSkillDTO;
 import com.connectbundle.connect.dto.UserDTO.CreateUserDTO;
 import com.connectbundle.connect.dto.UserDTO.UserResponseDTO;
 import com.connectbundle.connect.exception.ResourceAlreadyExistsException;
 
 import com.connectbundle.connect.exception.ResourceNotFoundException;
+import com.connectbundle.connect.model.Post;
 import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.model.UserSkill;
 import com.connectbundle.connect.model.enums.Role;
@@ -81,18 +84,24 @@ public class UserService {
         }
     }
 
-    public UserServiceResponse<User> getUserByUsername(String username) {
-        try {
-            Optional<User> optionalUser = userRepository.findByUsername(username);
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                return new UserServiceResponse<>(true, "User fetched successfully", user);
-            } else {
-                return new UserServiceResponse<>(false, "User does not exist", null);
-            }
-        } catch (Exception e) {
-            return new UserServiceResponse<>(false, e.getMessage(), null);
-        }
+    public ResponseEntity<BaseResponse<UserResponseDTO>> getUserByUsername(String username) {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
+            UserResponseDTO userResponseDTO = modelMapper.map(user, UserResponseDTO.class);
+            List<Post> posts = user.getPosts();
+            List<PostResponseDTO> postResponseDTOS = posts.stream()
+                    .map(post -> {
+                        PostResponseDTO postDTO = modelMapper.map(post, PostResponseDTO.class);
+
+                        PostAuthorDTO authorDTO = modelMapper.map(post.getAuthor(), PostAuthorDTO.class);
+
+                        postDTO.setAuthor(authorDTO);
+
+                        return postDTO;
+                    })
+                    .toList();
+            userResponseDTO.setPost(postResponseDTOS);
+        return BaseResponse.success(userResponseDTO,"User fetched successfully",1);
     }
 
     public UserServiceResponse<User> getUserByID(Long id) {

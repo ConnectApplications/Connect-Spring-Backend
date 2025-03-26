@@ -27,6 +27,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name="author_id",referencedColumnName = "id",nullable = false)
+
     private User author;
 
     @Column(nullable = false, columnDefinition = "TEXT")
