@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.connectbundle.connect.dto.ProjectsDTO.CreateProjectDTO;
 import com.connectbundle.connect.model.Project;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.repository.ProjectRepository;
 
 

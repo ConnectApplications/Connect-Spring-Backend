@@ -8,7 +8,7 @@ import com.connectbundle.connect.model.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {

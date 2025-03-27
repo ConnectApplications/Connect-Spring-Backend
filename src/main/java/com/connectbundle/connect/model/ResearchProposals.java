@@ -2,6 +2,7 @@ package com.connectbundle.connect.model;
 
 import java.time.LocalDate;
 
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.model.enums.ResearchProposalStatus;
 
 import jakarta.persistence.Column;

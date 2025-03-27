@@ -4,16 +4,12 @@ import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.PostsDTO.CreatePostDTO;
 import com.connectbundle.connect.dto.PostsDTO.PostAuthorDTO;
 import com.connectbundle.connect.dto.PostsDTO.PostResponseDTO;
-import com.connectbundle.connect.dto.ProjectsDTO.ProjectResponseDTO;
 import com.connectbundle.connect.exception.ResourceNotFoundException;
 import com.connectbundle.connect.filter.IdGenerator;
 import com.connectbundle.connect.model.Post;
-import com.connectbundle.connect.model.User;
-import com.connectbundle.connect.model.enums.PostTypeEnum;
-import com.connectbundle.connect.model.enums.PostVisibilityEnum;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.repository.PostsRepository;
 import com.connectbundle.connect.repository.UserRepository;
-import jakarta.persistence.PrePersist;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostsService {

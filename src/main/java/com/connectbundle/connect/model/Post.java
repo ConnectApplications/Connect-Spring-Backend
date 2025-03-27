@@ -1,9 +1,9 @@
 package com.connectbundle.connect.model;
 
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.model.enums.PostTypeEnum;
 import com.connectbundle.connect.model.enums.PostVisibilityEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

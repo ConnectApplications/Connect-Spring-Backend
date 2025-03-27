@@ -1,7 +1,7 @@
 package com.connectbundle.connect.repository;
 
 import com.connectbundle.connect.model.Follow;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

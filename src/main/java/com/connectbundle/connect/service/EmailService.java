@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.connectbundle.connect.model.OTP;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.repository.OtpRepository;
 import com.connectbundle.connect.repository.UserRepository;
 

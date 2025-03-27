@@ -2,8 +2,7 @@ package com.connectbundle.connect.model;
 
 import java.util.List;
 
-import com.connectbundle.connect.model.enums.PostTypeEnum;
-import com.connectbundle.connect.model.enums.PostVisibilityEnum;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.model.enums.ProjectLevelEnum;
 import com.connectbundle.connect.model.enums.ProjectStatusEnum;
 

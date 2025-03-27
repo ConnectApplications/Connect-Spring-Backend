@@ -2,7 +2,7 @@ package com.connectbundle.connect.service;
 
 import com.connectbundle.connect.exception.ResourceNotFoundException;
 import com.connectbundle.connect.model.Follow;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.repository.FollowRepository;
 import com.connectbundle.connect.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -15,12 +15,9 @@ import com.connectbundle.connect.dto.AuthDTO.SendOtpRequest;
 import com.connectbundle.connect.dto.AuthDTO.ValidateOtpRequest;
 import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.UserDTO.CreateUserDTO;
-import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.service.EmailService;
 import com.connectbundle.connect.service.EmailService.EmailServiceResponse;
-import com.connectbundle.connect.service.JWTService;
 import com.connectbundle.connect.service.UserService;
-import com.connectbundle.connect.service.UserService.UserServiceResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,16 +1,13 @@
 package com.connectbundle.connect.controller;
 
 import com.connectbundle.connect.dto.BaseResponse;
-import com.connectbundle.connect.model.Follow;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/connection")

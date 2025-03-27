@@ -2,6 +2,7 @@ package com.connectbundle.connect.model;
 
 import java.time.LocalDate;
 
+import com.connectbundle.connect.model.User.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

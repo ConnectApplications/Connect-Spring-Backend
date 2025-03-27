@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.connectbundle.connect.model.Club;
 import com.connectbundle.connect.model.ClubMember;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 
 public interface ClubMemberRepository extends JpaRepository<ClubMember, Long> {
     Optional<ClubMember> findByClubAndUser(Club club, User user);

@@ -1,5 +1,6 @@
 package com.connectbundle.connect.model;
 
+import com.connectbundle.connect.model.User.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

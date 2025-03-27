@@ -2,7 +2,7 @@ package com.connectbundle.connect.service;
 
 import com.connectbundle.connect.dto.AwardsDTO.CreateAwardDTO;
 import com.connectbundle.connect.model.Awards;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.repository.AwardsRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;

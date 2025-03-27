@@ -1,5 +1,6 @@
 package com.connectbundle.connect.model;
 
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.model.enums.ClubRoleEnum;
 
 import jakarta.persistence.Entity;

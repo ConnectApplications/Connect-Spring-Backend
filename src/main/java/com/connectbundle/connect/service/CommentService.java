@@ -2,7 +2,7 @@ package com.connectbundle.connect.service;
 
 import com.connectbundle.connect.model.Comment;
 import com.connectbundle.connect.model.Post;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.repository.CommentRepository;
 import com.connectbundle.connect.repository.PostsRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -5,11 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.connectbundle.connect.dto.EventsDTO.CreateEventDTO;
 import com.connectbundle.connect.model.Event;
-import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.repository.EventRepository;
-import com.connectbundle.connect.service.UserService.UserServiceResponse;
 
 import lombok.Getter;
 

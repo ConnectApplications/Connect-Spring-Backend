@@ -1,8 +1,7 @@
 package com.connectbundle.connect.service;
 
-import java.util.Collections;
-import java.util.Optional;
-
+import com.connectbundle.connect.model.User.User;
+import com.connectbundle.connect.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,9 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.connectbundle.connect.model.CustomUserDetails;
-import com.connectbundle.connect.model.User;
-import com.connectbundle.connect.repository.UserRepository;
+import java.util.Collections;
 
 
 @Service
@@ -31,7 +28,7 @@ public class MyUserDetailsService implements UserDetailsService {
         String authority = "ROLE_" + user.getRole().name(); // e.g., ROLE_STUDENT
 
         return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
+                user.getUsername(),
                 user.getPassword(),
                 user.isActive(),
                 true, true, true,

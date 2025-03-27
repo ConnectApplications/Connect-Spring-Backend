@@ -1,14 +1,14 @@
-package com.connectbundle.connect.model;
+package com.connectbundle.connect.model.User;
 
-import java.util.List;
-
+import com.connectbundle.connect.model.*;
 import com.connectbundle.connect.model.enums.Role;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -43,6 +43,9 @@ public class User {
 
     private boolean isActive;
 
+    @Embedded
+    private SocialLinks socialLinks;
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
@@ -51,12 +54,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSkill> userSkills;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Student_Details studentDetails;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Faculty_Details facultyDetails;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BooksPublished> booksPublished;
@@ -76,11 +73,25 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OfficeBearer> officeBearerRoles;
 
+    @Embedded
+    private StudentDetails studentDetails;
+
+    @Embedded
+    private FacultyDetails facultyDetails;
+
+    @ElementCollection
+    private List<String> achievement;
+
+    @ElementCollection
+    private List<String> interest;
+
+
     @PrePersist
     public void setDefaults() {
         if (this.role == null) {
             this.role = Role.STUDENT;
         }
+        this.isActive = true;
 
     }
 }

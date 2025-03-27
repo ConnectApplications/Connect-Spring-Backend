@@ -7,16 +7,15 @@ import com.connectbundle.connect.dto.PostsDTO.PostAuthorDTO;
 import com.connectbundle.connect.dto.PostsDTO.PostResponseDTO;
 import com.connectbundle.connect.dto.UserDTO.AddUserSkillDTO;
 import com.connectbundle.connect.dto.UserDTO.CreateUserDTO;
+import com.connectbundle.connect.dto.UserDTO.UpdateUserDTO;
 import com.connectbundle.connect.dto.UserDTO.UserResponseDTO;
 import com.connectbundle.connect.exception.ResourceAlreadyExistsException;
-
 import com.connectbundle.connect.exception.ResourceNotFoundException;
 import com.connectbundle.connect.model.Post;
-import com.connectbundle.connect.model.User;
+import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.model.UserSkill;
 import com.connectbundle.connect.model.enums.Role;
 import com.connectbundle.connect.repository.UserRepository;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +66,51 @@ public class UserService {
         }
         User newUser = modelMapper.map(userDTO, User.class);
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        newUser.setAchievement(userDTO.getAchievement());
+        newUser.setInterest(userDTO.getInterest());
+        newUser.setSocialLinks(userDTO.getSocialLinks());
+        newUser.setStudentDetails(userDTO.getStudentDetails());
+        newUser.setFacultyDetails(userDTO.getFacultyDetails());
         User savedUser = userRepository.save(newUser);
         UserResponseDTO userResponseDTO = modelMapper.map(savedUser, UserResponseDTO.class);
+        userResponseDTO.setAchievement(savedUser.getAchievement());
+        userResponseDTO.setInterest(savedUser.getInterest());
+        userResponseDTO.setSocialLinks(savedUser.getSocialLinks());
+        userResponseDTO.setStudentDetails(savedUser.getStudentDetails());
+        userResponseDTO.setFacultyDetails(savedUser.getFacultyDetails());
         return BaseResponse.success(userResponseDTO, "User registered successfully", 1);
     }
+
+
+    public ResponseEntity<BaseResponse<UserResponseDTO>> updateUser(String userName, UpdateUserDTO updateDTO) {
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "userName", userName));
+
+        if (updateDTO.getName() != null) user.setName(updateDTO.getName());
+        if (updateDTO.getHeadline() != null) user.setHeadline(updateDTO.getHeadline());
+        if (updateDTO.getAbout() != null) user.setAbout(updateDTO.getAbout());
+        if (updateDTO.getLocation() != null) user.setLocation(updateDTO.getLocation());
+        if (updateDTO.getIndustry() != null) user.setIndustry(updateDTO.getIndustry());
+        if (updateDTO.getCurrentPosition() != null) user.setCurrentPosition(updateDTO.getCurrentPosition());
+
+        if (updateDTO.getAchievement() != null) user.setAchievement(updateDTO.getAchievement());
+        if (updateDTO.getInterest() != null) user.setInterest(updateDTO.getInterest());
+        if (updateDTO.getSocialLinks() != null) user.setSocialLinks(updateDTO.getSocialLinks());
+
+        if (updateDTO.getStudentDetails() != null) user.setStudentDetails(updateDTO.getStudentDetails());
+        if (updateDTO.getFacultyDetails() != null) user.setFacultyDetails(updateDTO.getFacultyDetails());
+
+        User updatedUser = userRepository.save(user);
+        UserResponseDTO responseDTO = modelMapper.map(updatedUser, UserResponseDTO.class);
+        responseDTO.setAchievement(updatedUser.getAchievement());
+        responseDTO.setInterest(updatedUser.getInterest());
+        responseDTO.setSocialLinks(updatedUser.getSocialLinks());
+        responseDTO.setStudentDetails(updatedUser.getStudentDetails());
+        responseDTO.setFacultyDetails(updatedUser.getFacultyDetails());
+
+        return BaseResponse.success(responseDTO, "User updated successfully", 1);
+    }
+
 
 
 
