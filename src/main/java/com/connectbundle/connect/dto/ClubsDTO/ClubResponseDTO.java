@@ -29,6 +29,6 @@ public class ClubResponseDTO {
     private List<UserResponseDTO> officeBearers;
 //    private List<UserResponseDTO> clubMembers;
 //    private List<UserResponseDTO> events;
-//    private PlanOfActionDTO planOfAction;
+    private PlanOfActionDTO planOfAction;
 
 }
