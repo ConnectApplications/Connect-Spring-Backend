@@ -3,7 +3,11 @@ package com.connectbundle.connect.service;
 import java.util.List;
 
 import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.dto.ClubsDTO.ClubResponseDTO;
+import com.connectbundle.connect.dto.PostsDTO.PostAuthorDTO;
+import com.connectbundle.connect.dto.PostsDTO.PostResponseDTO;
 import com.connectbundle.connect.exception.ResourceAlreadyExistsException;
+import com.connectbundle.connect.model.Post;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +41,7 @@ public class ClubsService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public ResponseEntity<BaseResponse<Club>> createClub(CreateClubDTO clubDTO) {
+    public ResponseEntity<BaseResponse<ClubResponseDTO>> createClub(CreateClubDTO clubDTO) {
         if (clubsRespository.findByName(clubDTO.getName()).isPresent()) {
             throw new ResourceAlreadyExistsException("Club", "name", clubDTO.getName());
         }
@@ -53,15 +57,20 @@ public class ClubsService {
         club.setClubHead(clubHead);
         club.setMembers_count(0);
         clubsRespository.save(club);
-        return BaseResponse.success(club, "Club saved successfully", 1);
+
+        ClubResponseDTO clubResponse = modelMapper.map(club, ClubResponseDTO.class);
+        return BaseResponse.success(clubResponse, "Club saved successfully", 1);
     }
 
-    public ClubServiceResponse<List<Club>> getAllClubs() {
-        try {
-            return new ClubServiceResponse<>(true, "Clubs fetched successfully", clubsRespository.findAll());
-        } catch (Exception e) {
-            return new ClubServiceResponse<>(false, e.getMessage(), null);
-        }
+    public  ResponseEntity<BaseResponse<List<ClubResponseDTO>>> getAllClubs() {
+        List<Club> clubs = clubsRespository.findAll();
+        List<ClubResponseDTO> clubResponseDTOS = clubs.stream()
+                .map(club -> {
+                    return modelMapper.map(club, ClubResponseDTO.class);
+                })
+                .toList();
+
+        return BaseResponse.success(clubResponseDTOS, "Clubs fetched successfully", clubResponseDTOS.size());
     }
 
     public ClubServiceResponse<Club> getClubById(Long id) {

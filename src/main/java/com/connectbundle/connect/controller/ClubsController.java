@@ -2,6 +2,7 @@ package com.connectbundle.connect.controller;
 
 import java.util.List;
 
+import com.connectbundle.connect.dto.ClubsDTO.ClubResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,17 +36,8 @@ public class ClubsController {
 
     @GetMapping()
     @Operation(summary = "Get All Clubs", description = "Retrieve a list of all clubs")
-    public ResponseEntity<BaseResponse<List<Club>>> getAllClubs() {
-        try {
-            ClubServiceResponse<List<Club>> clubServiceResponse = clubsService.getAllClubs();
-            if (clubServiceResponse.isSuccess()) {
-                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(), clubServiceResponse.getData().size());
-            } else {
-                return BaseResponse.error(clubServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<BaseResponse<List<ClubResponseDTO>>> getAllClubs() {
+         return clubsService.getAllClubs();
     }
 
     @GetMapping("/{id}")
@@ -65,7 +57,7 @@ public class ClubsController {
 
     @PostMapping
     @Operation(summary = "Create Club", description = "Create a new club")
-    public ResponseEntity<BaseResponse<Club>> createClub(@Valid @RequestBody CreateClubDTO club) {
+    public ResponseEntity<BaseResponse<ClubResponseDTO>> createClub(@Valid @RequestBody CreateClubDTO club) {
         return clubsService.createClub(club);
     }
 
