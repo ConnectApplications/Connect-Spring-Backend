@@ -35,7 +35,7 @@ public class JWTService {
 
     public String generateToken(User user, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+        claims.put("role", user.getRole().name());
         claims.put("userId", user.getId());
         Key key = getSigningKey();
         return Jwts.builder()

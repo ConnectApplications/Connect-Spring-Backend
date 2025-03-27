@@ -55,6 +55,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/webjars/**")
                         .permitAll()
+                        .requestMatchers("/api/student/**").hasRole("STUDENT")
+                        .requestMatchers("/api/faculty/**").hasRole("FACULTY")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow preflight requests
                         .anyRequest().authenticated()
                 )

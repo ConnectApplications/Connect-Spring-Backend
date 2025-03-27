@@ -40,9 +40,12 @@ public class UserController {
     @GetMapping("/{username}")
     @Operation(summary = "Get User By Username", description = "Fetch user by username")
     public ResponseEntity<BaseResponse<UserResponseDTO>> getUserByUsername(@PathVariable String username) {
+
         return  userService.getUserByUsername(username);
 
     }
+
+
 
 
 //    @PostMapping("/uploadProfilePicture/{username}")

@@ -30,8 +30,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private String firstName;
-    private String lastName;
+    private String name;
     private String profilePicture;
     private String headline;
     private String about;

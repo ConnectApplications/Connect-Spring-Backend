@@ -1,8 +1,10 @@
 package com.connectbundle.connect.service;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,13 +23,20 @@ public class MyUserDetailsService implements UserDetailsService {
     UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (!user.isPresent()) {
-            System.out.println("User not found");
-            throw new UsernameNotFoundException("User not found");
-        }
-        return new CustomUserDetails(user.get());
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Convert role to authority
+        String authority = "ROLE_" + user.getRole().name(); // e.g., ROLE_STUDENT
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                user.isActive(),
+                true, true, true,
+                Collections.singletonList(new SimpleGrantedAuthority(authority))
+        );
     }
 
 

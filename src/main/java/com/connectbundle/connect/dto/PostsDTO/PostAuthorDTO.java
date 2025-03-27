@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class PostAuthorDTO {
-    private String firstName;
+    private String name;
     private String profilePicture;
     private String headline;
 }

@@ -22,11 +22,8 @@ public class CreateUserDTO {
     @NotBlank(message = "Password must not be empty")
     private String password;
 
-    @NotBlank(message = "FirstName must not be empty")
-    private String firstName;
-
-    @NotBlank(message = "LastName must not be empty")
-    private String lastName;
+    @NotBlank(message = "Name must not be empty")
+    private String name;
 
     private String headline;  // Optional
 

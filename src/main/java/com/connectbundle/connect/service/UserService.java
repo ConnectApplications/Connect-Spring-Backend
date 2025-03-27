@@ -16,6 +16,7 @@ import com.connectbundle.connect.model.User;
 import com.connectbundle.connect.model.UserSkill;
 import com.connectbundle.connect.model.enums.Role;
 import com.connectbundle.connect.repository.UserRepository;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +125,30 @@ public class UserService {
         } catch (Exception e) {
             return new UserServiceResponse<>(false, e.getMessage(), null);
         }
+    }
+
+    public ResponseEntity<BaseResponse<List<UserResponseDTO>>> searchByNameAndRole(Role role, String name) {
+        List<User> users;
+        if (role != null) {
+            if (name != null && !name.isEmpty()) {
+                users = userRepository.findByRoleAndNameContainingIgnoreCase(role, name);
+            } else {
+                users = userRepository.findByRole(role);
+            }
+
+        } else {
+            if (name != null && !name.isEmpty()) {
+                users = userRepository.findByNameContainingIgnoreCase(name);
+            } else {
+                users = userRepository.findAll();
+            }
+        }
+
+        List<UserResponseDTO> userResponseDTOS = users.stream()
+                .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                .toList();
+        return BaseResponse.success(userResponseDTOS,"Search users fetched",userResponseDTOS.size());
+
     }
 
     public UserServiceResponse<Void> deleteUserByUsername(String username) {
