@@ -3,6 +3,7 @@ package com.connectbundle.connect.controller;
 import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.PostsDTO.CreatePostDTO;
 import com.connectbundle.connect.dto.PostsDTO.PostResponseDTO;
+import com.connectbundle.connect.dto.PostsDTO.UpdatePostDTO;
 import com.connectbundle.connect.service.PostsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -36,11 +37,19 @@ public class PostController {
     public ResponseEntity<BaseResponse<PostResponseDTO>> createPost(@Valid @RequestBody CreatePostDTO postDTO) throws NoSuchAlgorithmException {
             return postService.createPost(postDTO);
         }
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse<PostResponseDTO>> updatePost(
+            @Valid @RequestBody UpdatePostDTO postDTO,
+            @PathVariable("id") String id
+    ) {
+        return postService.updatePost(postDTO,id);
+    }
 
-//    @DeleteMapping("/{id}")
-//    public void deletePost(@PathVariable Long id) {
-//        postService.deletePost(id);
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponse<Void>> deletePost(@PathVariable("id") String id) {
+        return postService.deletePost(id);
+    }
+
 
 
 }

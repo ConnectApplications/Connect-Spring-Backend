@@ -4,6 +4,7 @@ import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.PostsDTO.CreatePostDTO;
 import com.connectbundle.connect.dto.PostsDTO.PostAuthorDTO;
 import com.connectbundle.connect.dto.PostsDTO.PostResponseDTO;
+import com.connectbundle.connect.dto.PostsDTO.UpdatePostDTO;
 import com.connectbundle.connect.exception.ResourceNotFoundException;
 import com.connectbundle.connect.filter.IdGenerator;
 import com.connectbundle.connect.model.Post;
@@ -89,9 +90,58 @@ public class PostsService {
         return BaseResponse.success(postResponseDTO, "Post saved successfully",1);
     }
 
-//    public void deletePost(Long id){
-//         postsRepository.deleteById(id);
-//    }
+
+    public ResponseEntity<BaseResponse<PostResponseDTO>> updatePost(UpdatePostDTO postDTO,String id)
+    {
+        Post post = postsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return BaseResponse.error("Unauthorized access", HttpStatus.UNAUTHORIZED);
+        }
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
+
+        if (!post.getAuthor().getId().equals(user.getId())) {
+            return BaseResponse.error("You are not authorized to edit this post", HttpStatus.FORBIDDEN);
+        }
+
+        if (postDTO.getContent() != null) post.setContent(postDTO.getContent());
+        if (postDTO.getType() != null) post.setType(postDTO.getType());
+        if (postDTO.getVisibility() != null) post.setVisibility(postDTO.getVisibility());
+        if (postDTO.getTags() != null) post.setTags(postDTO.getTags());
+        if (postDTO.getMedia() != null) post.setMedia(postDTO.getMedia());
+
+        Post savedPost = postsRepository.save(post);
+        PostResponseDTO postResponseDTO = modelMapper.map(savedPost, PostResponseDTO.class);
+        PostAuthorDTO authorDTO = modelMapper.map(postResponseDTO.getAuthor(), PostAuthorDTO.class);
+        postResponseDTO.setAuthor(authorDTO);
+        return BaseResponse.success(postResponseDTO, "Post saved successfully",1);
+    }
+    public ResponseEntity<BaseResponse<Void>> deletePost(String id) {
+        Post post = postsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return BaseResponse.error("Unauthorized access", HttpStatus.UNAUTHORIZED);
+        }
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
+
+        if (!post.getAuthor().getId().equals(user.getId())) {
+            return BaseResponse.error("You are not authorized to delete this post", HttpStatus.FORBIDDEN);
+        }
+
+        postsRepository.delete(post);
+        return BaseResponse.success(null, "Post deleted successfully", 1);
+    }
 
 
 
