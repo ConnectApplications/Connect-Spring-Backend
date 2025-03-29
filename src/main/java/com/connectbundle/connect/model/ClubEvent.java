@@ -41,4 +41,9 @@ public class ClubEvent {
 
     @Column(columnDefinition = "TEXT")
     private String remarks;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "event_id", referencedColumnName = "id", nullable = false)
+    private Event event;
+
 } 

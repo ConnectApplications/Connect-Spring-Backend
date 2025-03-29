@@ -1,5 +1,6 @@
 package com.connectbundle.connect.dto.ClubsDTO;
 
+import com.connectbundle.connect.dto.EventsDTO.EventResponseDTO;
 import com.connectbundle.connect.dto.UserDTO.SimplifiedUserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,7 @@ public class ClubResponseDTO {
 
 
     private List<SimplifiedUserResponseDTO> clubMembers;
-//    private List<ClubEventDTO> upcomingEvents;
+    private List<EventResponseDTO> events;
     private PlanOfActionDTO planOfAction;
 
 }

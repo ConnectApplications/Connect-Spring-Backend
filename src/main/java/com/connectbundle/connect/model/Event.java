@@ -62,6 +62,10 @@ public class Event {
 
     private Boolean isPublic = true;
 
+    @ManyToOne
+    @JoinColumn(name = "club_id", referencedColumnName = "id", nullable = true)
+    private Club club;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
