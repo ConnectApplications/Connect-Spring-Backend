@@ -1,6 +1,8 @@
 package com.connectbundle.connect.model.User;
 
 import com.connectbundle.connect.model.*;
+import com.connectbundle.connect.model.Publication.Publication;
+import com.connectbundle.connect.model.Publication.ResearchProposal;
 import com.connectbundle.connect.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -57,10 +59,12 @@ public class User {
     private List<UserSkill> userSkills;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BooksPublished> booksPublished;
+    private List<Publication> publications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "submittedBy", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ResearchProposals> researchProposals;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ResearchProposal> researchProposals = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Awards> awards;

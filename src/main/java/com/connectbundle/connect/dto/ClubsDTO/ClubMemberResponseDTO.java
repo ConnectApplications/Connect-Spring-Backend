@@ -15,4 +15,5 @@ public class ClubMemberResponseDTO {
     private String clubName;
     private String rollNo;
     private ClubRoleEnum role;
+    private String userName;
 }

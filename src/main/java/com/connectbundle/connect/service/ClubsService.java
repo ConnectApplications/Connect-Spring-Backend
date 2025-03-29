@@ -369,6 +369,7 @@ public class ClubsService {
         dto.setClubName(member.getClub().getName());
         dto.setRollNo(member.getRollNo());
         dto.setRole(member.getRole());
+        dto.setUserName(member.getUser().getUsername());
         
         return dto;
     }
@@ -394,6 +395,7 @@ public class ClubsService {
             ClubRoleEnum role = userMembership.getRole();
             boolean canEdit = role == ClubRoleEnum.PRESIDENT || 
                                role == ClubRoleEnum.VICE_PRESIDENT || role == ClubRoleEnum.ADMIN ||
+                               
                                role == ClubRoleEnum.SECRETARY;
             dto.setCanEdit(canEdit);
         }
