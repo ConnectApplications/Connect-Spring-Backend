@@ -65,7 +65,7 @@ public class Club {
 //    private List<Post> activityFeed = new ArrayList<>();
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ClubEvent> upcomingEvents = new ArrayList<>();
+    private List<Event> events = new ArrayList<>();
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Achievement> achievements = new ArrayList<>();
