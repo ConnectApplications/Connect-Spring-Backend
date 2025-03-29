@@ -2,11 +2,13 @@ package com.connectbundle.connect.service;
 
 import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.ClubsDTO.*;
+import com.connectbundle.connect.dto.EventsDTO.EventResponseDTO;
 import com.connectbundle.connect.dto.UserDTO.SimplifiedUserResponseDTO;
 import com.connectbundle.connect.exception.ResourceAlreadyExistsException;
 import com.connectbundle.connect.exception.ResourceNotFoundException;
 import com.connectbundle.connect.model.Club;
 import com.connectbundle.connect.model.ClubMember;
+import com.connectbundle.connect.model.Event;
 import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.model.enums.ClubRoleEnum;
 import com.connectbundle.connect.repository.ClubMemberRepository;
@@ -21,6 +23,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -59,8 +63,9 @@ public class ClubsService {
         Club club = modelMapper.map(clubDTO, Club.class);
         club.setAdvisor(advisor);
         club.setCreatedBy(user);
-        clubsRespository.save(club);
+        
 
+        clubsRespository.save(club);
         ClubResponseDTO clubResponse = modelMapper.map(club, ClubResponseDTO.class);
         clubResponse.setCreatedBy(modelMapper.map(club.getCreatedBy(), SimplifiedUserResponseDTO.class));
 
@@ -68,24 +73,73 @@ public class ClubsService {
             clubResponse.setAdvisor(modelMapper.map(club.getAdvisor(), SimplifiedUserResponseDTO.class));
         }
 
-
-        List<SimplifiedUserResponseDTO> members = club.getMembers().stream()
-                .map(member -> modelMapper.map(member.getUser(), SimplifiedUserResponseDTO.class))
+        club = clubsRespository.findById(club.getId()).orElse(club);
+        List<ClubMemberResponseDTO> members = safelyConvertCollection(club.getMembers()).stream()
+                .map(this::mapClubMemberToDTO)
                 .toList();
-        clubResponse.setClubMembers(members);
-
+        clubResponse.setMembers(members);
 
         if (club.getPlanOfAction() != null) {
             clubResponse.setPlanOfAction(modelMapper.map(club.getPlanOfAction(), PlanOfActionDTO.class));
         }
+        
+
+        setUserMembershipDetails(clubResponse, club, user);
+        
         return BaseResponse.success(clubResponse, "Club saved successfully", 1);
     }
 
-    public  ResponseEntity<BaseResponse<List<ClubResponseDTO>>> getAllClubs() {
+    public ResponseEntity<BaseResponse<List<ClubResponseDTO>>> getAllClubs() {
+        // Get the current authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = null;
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
+            String username = authentication.getName();
+            currentUser = userRepository.findByUsername(username).orElse(null);
+        }
+        
+        final User finalCurrentUser = currentUser; // Need final reference for lambda
+
         List<Club> clubs = clubsRespository.findAll();
         List<ClubResponseDTO> clubResponseDTOS = clubs.stream()
                 .map(club -> {
-                    return modelMapper.map(club, ClubResponseDTO.class);
+                    ClubResponseDTO dto = modelMapper.map(club, ClubResponseDTO.class);
+                    
+                    // Manually map collections to avoid Hibernate PersistentBag conversion issues
+                    if (club.getCreatedBy() != null) {
+                        dto.setCreatedBy(modelMapper.map(club.getCreatedBy(), SimplifiedUserResponseDTO.class));
+                    }
+                    
+                    if (club.getAdvisor() != null) {
+                        dto.setAdvisor(modelMapper.map(club.getAdvisor(), SimplifiedUserResponseDTO.class));
+                    }
+                    
+                    // Manually map members collection
+                    List<ClubMemberResponseDTO> members = safelyConvertCollection(club.getMembers()).stream()
+                            .map(this::mapClubMemberToDTO)
+                            .toList();
+                    dto.setMembers(members);
+                    
+                    // Manually map events collection
+                    if (club.getEvents() != null) {
+                        // Create a new ArrayList explicitly to disconnect from Hibernate's PersistentBag
+                        List<Event> eventList = safelyConvertCollection(club.getEvents());
+                        
+                        List<EventResponseDTO> eventDTOs = eventList.stream()
+                                .map(this::mapEventToDTO)
+                                .toList();
+                        dto.setEvents(eventDTOs);
+                    }
+                    
+                    // Map PlanOfAction if exists
+                    if (club.getPlanOfAction() != null) {
+                        dto.setPlanOfAction(modelMapper.map(club.getPlanOfAction(), PlanOfActionDTO.class));
+                    }
+                    
+                    // Set user membership details
+                    setUserMembershipDetails(dto, club, finalCurrentUser);
+                    
+                    return dto;
                 })
                 .toList();
 
@@ -93,10 +147,53 @@ public class ClubsService {
     }
 
     public ResponseEntity<BaseResponse<ClubResponseDTO>> getClubById(Long id) {
+        // Get the current authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = null;
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
+            String username = authentication.getName();
+            currentUser = userRepository.findByUsername(username).orElse(null);
+        }
+
         Club club = clubsRespository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Club", "id", id));
 
         ClubResponseDTO dto = modelMapper.map(club, ClubResponseDTO.class);
+        
+        // Manually map collections to avoid Hibernate PersistentBag conversion issues
+        if (club.getCreatedBy() != null) {
+            dto.setCreatedBy(modelMapper.map(club.getCreatedBy(), SimplifiedUserResponseDTO.class));
+        }
+        
+        if (club.getAdvisor() != null) {
+            dto.setAdvisor(modelMapper.map(club.getAdvisor(), SimplifiedUserResponseDTO.class));
+        }
+        
+        // Manually map members collection
+        List<ClubMemberResponseDTO> members = safelyConvertCollection(club.getMembers()).stream()
+                .map(this::mapClubMemberToDTO)
+                .toList();
+        dto.setMembers(members);
+        
+        // Manually map events collection
+        if (club.getEvents() != null) {
+            // Create a new ArrayList explicitly to disconnect from Hibernate's PersistentBag
+            List<Event> eventList = safelyConvertCollection(club.getEvents());
+            
+            List<EventResponseDTO> eventDTOs = eventList.stream()
+                    .map(this::mapEventToDTO)
+                    .toList();
+            dto.setEvents(eventDTOs);
+        }
+        
+        // Map PlanOfAction if exists
+        if (club.getPlanOfAction() != null) {
+            dto.setPlanOfAction(modelMapper.map(club.getPlanOfAction(), PlanOfActionDTO.class));
+        }
+        
+        // Set user membership details
+        setUserMembershipDetails(dto, club, currentUser);
+        
         return BaseResponse.success(dto, "Club fetched", 1);
     }
 
@@ -219,6 +316,86 @@ public class ClubsService {
             this.success = success;
             this.message = message;
             this.data = data;
+        }
+    }
+
+    /**
+     * Utility method to safely convert any collection (including Hibernate collections) to a regular ArrayList
+     * to avoid Hibernate proxy-related issues
+     */
+    private <T> List<T> safelyConvertCollection(Collection<T> collection) {
+        if (collection == null) {
+            return new ArrayList<>();
+        }
+        
+        // Safely detach from any Hibernate proxies by creating a new ArrayList
+        return new ArrayList<>(collection);
+    }
+
+    /**
+     * Maps an event to an EventResponseDTO with safe handling of collections
+     */
+    private EventResponseDTO mapEventToDTO(Event event) {
+        if (event == null) {
+            return null;
+        }
+        
+        EventResponseDTO dto = modelMapper.map(event, EventResponseDTO.class);
+        
+        // Manually map collections to avoid Hibernate proxy issues
+        if (event.getTheme() != null) {
+            dto.setTheme(safelyConvertCollection(event.getTheme()));
+        }
+        
+        if (event.getOtherSpeakers() != null) {
+            dto.setOtherSpeakers(safelyConvertCollection(event.getOtherSpeakers()));
+        }
+        
+        return dto;
+    }
+
+    /**
+     * Maps a ClubMember to a ClubMemberResponseDTO with safe handling of collections
+     */
+    private ClubMemberResponseDTO mapClubMemberToDTO(ClubMember member) {
+        if (member == null) {
+            return null;
+        }
+        
+        ClubMemberResponseDTO dto = new ClubMemberResponseDTO();
+        
+        // Map fields explicitly since ModelMapper might have issues
+        dto.setClubId(member.getClub().getId());
+        dto.setClubName(member.getClub().getName());
+        dto.setRollNo(member.getRollNo());
+        dto.setRole(member.getRole());
+        
+        return dto;
+    }
+
+    private void setUserMembershipDetails(ClubResponseDTO dto, Club club, User currentUser) {
+        // Default values
+        dto.setUserMember(false);
+        dto.setUserRole(null);
+        dto.setCanEdit(false);
+        
+        if (currentUser == null) {
+            return;
+        }
+        
+        // Find if the current user is a member of this club
+        ClubMember userMembership = clubMemberRepository.findByClubAndUser(club, currentUser).orElse(null);
+        
+        if (userMembership != null) {
+            dto.setUserMember(true);
+            dto.setUserRole(userMembership.getRole());
+            
+            // Check if user can edit (PRESIDENT, VICE_PRESIDENT, SECRETARY)
+            ClubRoleEnum role = userMembership.getRole();
+            boolean canEdit = role == ClubRoleEnum.PRESIDENT || 
+                               role == ClubRoleEnum.VICE_PRESIDENT || role == ClubRoleEnum.ADMIN ||
+                               role == ClubRoleEnum.SECRETARY;
+            dto.setCanEdit(canEdit);
         }
     }
 
