@@ -1,5 +1,6 @@
 package com.connectbundle.connect.dto.UserDTO;
 
+import com.connectbundle.connect.dto.ClubsDTO.ClubMemberResponseDTO;
 import com.connectbundle.connect.dto.PostsDTO.PostResponseDTO;
 import com.connectbundle.connect.model.User.FacultyDetails;
 import com.connectbundle.connect.model.User.SocialLinks;
@@ -32,5 +33,7 @@ public class UserResponseDTO {
     private FacultyDetails facultyDetails;
     private List<String> achievement;
     private List<String> interest;
+    private List<ClubMemberResponseDTO> clubMemberships;
+
 
 }

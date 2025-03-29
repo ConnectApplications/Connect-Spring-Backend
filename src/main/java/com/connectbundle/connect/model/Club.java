@@ -1,17 +1,22 @@
 package com.connectbundle.connect.model;
 
-import java.util.List;
-import java.time.LocalDateTime;
-
 import com.connectbundle.connect.model.User.User;
+import com.connectbundle.connect.model.enums.ClubJoinPolicy;
+import com.connectbundle.connect.model.enums.ClubVisibility;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "club")
+@Table(name = "clubs")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -25,23 +30,45 @@ public class Club {
     @Column(nullable = false)
     private String name;
 
+    private String banner;
+
+    private String logo;
+
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
     private String department;
+
+    @ElementCollection
+    @CollectionTable(name = "club_tags", joinColumns = @JoinColumn(name = "club_id"))
+    @Column(name = "tag")
+    private List<String> tags = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
     private String otherDetails;
 
-    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OfficeBearer> officeBearers;
+    @Enumerated(EnumType.STRING)
+    private ClubVisibility visibility = ClubVisibility.PUBLIC;
+
+    @Enumerated(EnumType.STRING)
+    private ClubJoinPolicy joinPolicy = ClubJoinPolicy.OPEN;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ClubMember> clubMembers;
+    private List<ClubMember> members = new ArrayList<>();
+
+//    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Post> activityFeed = new ArrayList<>();
 
     @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ClubEvent> events;
+    private List<ClubEvent> upcomingEvents = new ArrayList<>();
+
+    @OneToMany(mappedBy = "club", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Achievement> achievements = new ArrayList<>();
 
     @Embedded
     private PlanOfAction planOfAction;
@@ -50,28 +77,12 @@ public class Club {
     @JoinColumn(name = "advisor_id", referencedColumnName = "id", nullable = true)
     private User advisor;
 
-    @ManyToOne
-    @JoinColumn(name = "club_head_id", referencedColumnName = "id", nullable = false)
-    private User clubHead;
+    private boolean isActive = true;
 
-    @Column(nullable = false)
-    private int members_count;
-
-    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-        this.members_count = 0;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

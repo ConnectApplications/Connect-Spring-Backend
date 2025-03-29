@@ -1,18 +1,10 @@
 package com.connectbundle.connect.service;
 
-import java.util.List;
-
 import com.connectbundle.connect.dto.BaseResponse;
-import com.connectbundle.connect.dto.ClubsDTO.ClubResponseDTO;
+import com.connectbundle.connect.dto.ClubsDTO.*;
+import com.connectbundle.connect.dto.UserDTO.SimplifiedUserResponseDTO;
 import com.connectbundle.connect.exception.ResourceAlreadyExistsException;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
-import com.connectbundle.connect.dto.ClubsDTO.AddClubMemberDTO;
-import com.connectbundle.connect.dto.ClubsDTO.CreateClubDTO;
-import com.connectbundle.connect.dto.ClubsDTO.RemoveClubMemberDTO;
+import com.connectbundle.connect.exception.ResourceNotFoundException;
 import com.connectbundle.connect.model.Club;
 import com.connectbundle.connect.model.ClubMember;
 import com.connectbundle.connect.model.User.User;
@@ -20,8 +12,16 @@ import com.connectbundle.connect.model.enums.ClubRoleEnum;
 import com.connectbundle.connect.repository.ClubMemberRepository;
 import com.connectbundle.connect.repository.ClubsRespository;
 import com.connectbundle.connect.repository.UserRepository;
-
 import lombok.Getter;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ClubsService {
@@ -46,16 +46,38 @@ public class ClubsService {
                 ? userRepository.findByUsername(clubDTO.getAdvisor()).orElse(null)
                 : null;
 
-        User clubHead = userRepository.findByUsername(clubDTO.getClubHead())
-                .orElseThrow(() -> new RuntimeException("Club head not found"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return BaseResponse.error("Unauthorized access", HttpStatus.UNAUTHORIZED);
+        }
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
 
         Club club = modelMapper.map(clubDTO, Club.class);
         club.setAdvisor(advisor);
-        club.setClubHead(clubHead);
-        club.setMembers_count(0);
+        club.setCreatedBy(user);
         clubsRespository.save(club);
 
         ClubResponseDTO clubResponse = modelMapper.map(club, ClubResponseDTO.class);
+        clubResponse.setCreatedBy(modelMapper.map(club.getCreatedBy(), SimplifiedUserResponseDTO.class));
+
+        if (club.getAdvisor() != null) {
+            clubResponse.setAdvisor(modelMapper.map(club.getAdvisor(), SimplifiedUserResponseDTO.class));
+        }
+
+
+        List<SimplifiedUserResponseDTO> members = club.getMembers().stream()
+                .map(member -> modelMapper.map(member.getUser(), SimplifiedUserResponseDTO.class))
+                .toList();
+        clubResponse.setClubMembers(members);
+
+
+        if (club.getPlanOfAction() != null) {
+            clubResponse.setPlanOfAction(modelMapper.map(club.getPlanOfAction(), PlanOfActionDTO.class));
+        }
         return BaseResponse.success(clubResponse, "Club saved successfully", 1);
     }
 
@@ -83,6 +105,61 @@ public class ClubsService {
         }
     }
 
+    public ResponseEntity<BaseResponse<Void>> addClubMember(AddClubMemberDTO dto) {
+        Club club = clubsRespository.findById(dto.getClubId())
+                .orElseThrow(() -> new ResourceNotFoundException("Club", "id", dto.getClubId()));
+
+        User user = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", dto.getUsername()));
+
+        if (clubMemberRepository.findByClubAndUser(club, user).isPresent()) {
+            throw new ResourceAlreadyExistsException("ClubMember", "user", dto.getUsername());
+        }
+
+        ClubMember member = new ClubMember();
+        member.setClub(club);
+        member.setUser(user);
+        member.setRollNo(dto.getRollNo());
+        member.setRole(dto.getRole());
+
+        clubMemberRepository.save(member);
+
+        return BaseResponse.successMessage("Member added successfully");
+    }
+
+    public ResponseEntity<BaseResponse<Void>> updateClubMemberRole(UpdateClubMemberDTO dto) {
+        Club club = clubsRespository.findById(dto.getClubId())
+                .orElseThrow(() -> new ResourceNotFoundException("Club", "id", dto.getClubId()));
+
+        User user = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", dto.getUsername()));
+
+        ClubMember member = clubMemberRepository.findByClubAndUser(club, user)
+                .orElseThrow(() -> new ResourceNotFoundException("ClubMember", "username", dto.getUsername()));
+
+        member.setRole(dto.getNewRole());
+        clubMemberRepository.save(member);
+
+        return BaseResponse.successMessage("Member role updated successfully");
+    }
+
+
+    public ResponseEntity<BaseResponse<Void>> removeClubMember(RemoveClubMemberDTO dto) {
+        Club club = clubsRespository.findById(dto.getClubId())
+                .orElseThrow(() -> new ResourceNotFoundException("Club", "id", dto.getClubId()));
+
+        User user = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", dto.getUsername()));
+
+        ClubMember member = clubMemberRepository.findByClubAndUser(club, user)
+                .orElseThrow(() -> new ResourceNotFoundException("ClubMember", "username", dto.getUsername()));
+
+        clubMemberRepository.delete(member);
+
+        return BaseResponse.successMessage("Member removed successfully");
+    }
+
+
     public ClubServiceResponse<Club> addMemberToClub(AddClubMemberDTO clubMemberDTO) {
         try {
             Club club = clubsRespository.findById(clubMemberDTO.getClubId()).orElse(null);
@@ -94,7 +171,6 @@ public class ClubsService {
                 clubMember.setUser(user);
                 clubMember.setRole(ClubRoleEnum.MEMBER);
                 clubMemberRepository.save(clubMember);
-                club.setMembers_count(club.getMembers_count() + 1);
                 clubsRespository.save(club);
                 return new ClubServiceResponse<>(true, "Member added successfully", club);
             } else {
@@ -119,7 +195,6 @@ public class ClubsService {
                 ClubMember clubMember = clubMemberRepository.findByClubAndUser(club, user).orElse(null);
                 if (clubMember != null) {
                     clubMemberRepository.delete(clubMember);
-                    club.setMembers_count(club.getMembers_count() - 1);
                     clubsRespository.save(club);
                     return new ClubServiceResponse<>(true, "Member removed successfully", club);
                 } else {

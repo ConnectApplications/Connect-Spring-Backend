@@ -1,23 +1,20 @@
 package com.connectbundle.connect.model;
 
-import java.time.LocalDate;
-
-import com.connectbundle.connect.model.User.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.connectbundle.connect.model.enums.EventType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "event")
+@Table(name = "events")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,19 +25,46 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "organized_by", referencedColumnName = "id", nullable = false)
-    private User user;
+    private String title;
 
-    @Column(nullable = false)
-    private String event_name;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-    @Column(nullable = false)
-    private LocalDate date;
+    private LocalDateTime date;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Enumerated(EnumType.STRING)
+    private EventType type;
+
     private String location;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String description;
+    private String registrationLink;
+
+    private String natureOfEvent;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventPerson> responsiblePeople = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "event_themes", joinColumns = @JoinColumn(name = "event_id"))
+    private List<String> theme = new ArrayList<>();
+
+    private String fundingAgency;
+
+    private String chiefGuest;
+
+    @ElementCollection
+    @CollectionTable(name = "event_speakers", joinColumns = @JoinColumn(name = "event_id"))
+    private List<String> otherSpeakers = new ArrayList<>();
+
+    private Integer participantsCount;
+
+    private Boolean isCompleted = false;
+
+    private Boolean isPublic = true;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

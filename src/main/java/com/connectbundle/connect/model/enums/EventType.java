@@ -1,0 +1,26 @@
+package com.connectbundle.connect.model.enums;
+
+public enum EventType {
+    WORKSHOP,
+    SEMINAR,
+    GUEST_LECTURE,
+    HACKATHON,
+    COMPETITION,
+    FEST,
+    CULTURAL_EVENT,
+    SPORTS_EVENT,
+    CONFERENCE,
+    MEETUP,
+    ORIENTATION,
+    TRAINING_SESSION,
+    WEBINAR,
+    FIELD_VISIT,
+    INDUSTRIAL_VISIT,
+    PANEL_DISCUSSION,
+    ALUMNI_TALK,
+    CLUB_MEETING,
+    INAUGURATION,
+    CELEBRATION,
+    SOCIAL_DRIVE,
+    OTHER
+}
