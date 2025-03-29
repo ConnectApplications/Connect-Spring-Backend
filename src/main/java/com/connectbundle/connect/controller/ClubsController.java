@@ -31,17 +31,9 @@ public class ClubsController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Club By ID", description = "Retrieve a club by its ID")
-    public ResponseEntity<BaseResponse<Club>> getClubById(@PathVariable Long id) {
-        try {
-            ClubServiceResponse<Club> clubServiceResponse = clubsService.getClubById(id);
-            if (clubServiceResponse.isSuccess()) {
-                return BaseResponse.success(clubServiceResponse.getData(), clubServiceResponse.getMessage(), 1);
-            } else {
-                return BaseResponse.error(clubServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<BaseResponse<ClubResponseDTO>> getClubById(@PathVariable Long id) {
+        return clubsService.getClubById(id);
+
     }
 
     @PostMapping
