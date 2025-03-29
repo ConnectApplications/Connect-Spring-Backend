@@ -65,7 +65,7 @@ public class ProjectService {
         newProject.setOwnerId(ownerUser.getData());
         Project createdProject = projectRepository.save(newProject);
         ProjectResponseDTO responseDTO = modelMapper.map(createdProject, ProjectResponseDTO.class);
-        responseDTO.setOwnerId(createdProject.getOwnerId().getId());
+        //responseDTO.setOwnerId(createdProject.getOwnerId());
         return  BaseResponse.success(responseDTO, "Project created", 1);
     }
 

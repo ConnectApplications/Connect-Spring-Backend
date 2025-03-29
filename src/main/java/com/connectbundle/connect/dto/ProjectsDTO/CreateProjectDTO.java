@@ -1,5 +1,8 @@
 package com.connectbundle.connect.dto.ProjectsDTO;
 
+import com.connectbundle.connect.model.ProjectApplication;
+import com.connectbundle.connect.model.ProjectTeamMember;
+import com.connectbundle.connect.model.ProjectVerification;
 import com.connectbundle.connect.model.enums.ProjectLevelEnum;
 import com.connectbundle.connect.model.enums.ProjectStatusEnum;
 
@@ -38,6 +41,12 @@ public class CreateProjectDTO {
     private ProjectLevelEnum projectLevel;
 
     private ProjectStatusEnum projectStatus;
+
+    private ProjectApplication[] projectApplications;
+
+    private ProjectTeamMember[] projectTeamMembers;
+
+    private ProjectVerification[] projectVerifications;
 
     //private Integer maxTeamSize;
 
