@@ -92,18 +92,14 @@ public class ClubsService {
         return BaseResponse.success(clubResponseDTOS, "Clubs fetched successfully", clubResponseDTOS.size());
     }
 
-    public ClubServiceResponse<Club> getClubById(Long id) {
-        try {
-            Club club = clubsRespository.findById(id).orElse(null);
-            if (club != null) {
-                return new ClubServiceResponse<>(true, "Club fetched successfully", club);
-            } else {
-                return new ClubServiceResponse<>(false, "Club not found", null);
-            }
-        } catch (Exception e) {
-            return new ClubServiceResponse<>(false, e.getMessage(), null);
-        }
+    public ResponseEntity<BaseResponse<ClubResponseDTO>> getClubById(Long id) {
+        Club club = clubsRespository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Club", "id", id));
+
+        ClubResponseDTO dto = modelMapper.map(club, ClubResponseDTO.class);
+        return BaseResponse.success(dto, "Club fetched", 1);
     }
+
 
     public ResponseEntity<BaseResponse<Void>> addClubMember(AddClubMemberDTO dto) {
         Club club = clubsRespository.findById(dto.getClubId())

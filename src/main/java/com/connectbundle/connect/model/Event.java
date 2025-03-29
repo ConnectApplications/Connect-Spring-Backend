@@ -42,7 +42,7 @@ public class Event {
     private String natureOfEvent;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EventPerson> responsiblePeople = new ArrayList<>();
+    private List<EventPerson> eventTeam = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "event_themes", joinColumns = @JoinColumn(name = "event_id"))
