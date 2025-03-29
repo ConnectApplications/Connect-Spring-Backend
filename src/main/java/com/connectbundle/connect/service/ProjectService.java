@@ -1,23 +1,40 @@
 package com.connectbundle.connect.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.connectbundle.connect.dto.BaseResponse;
 import com.connectbundle.connect.dto.ProjectsDTO.ProjectResponseDTO;
+import com.connectbundle.connect.dto.ProjectsDTO.UpdateProjectDTO;
+
 import jakarta.transaction.Transactional;
+
+import org.apache.catalina.connector.Response;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.bytebuddy.asm.Advice.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.connectbundle.connect.dto.ProjectsDTO.AddUserToApplicationDTO;
 import com.connectbundle.connect.dto.ProjectsDTO.CreateProjectDTO;
 import com.connectbundle.connect.model.Project;
+import com.connectbundle.connect.model.ProjectApplication;
+import com.connectbundle.connect.model.ProjectTeamMember;
+import com.connectbundle.connect.model.ProjectVerification;
 import com.connectbundle.connect.model.User.User;
+import com.connectbundle.connect.model.enums.ProjectApplicationStatus;
+import com.connectbundle.connect.model.enums.ProjectTeamRole;
 import com.connectbundle.connect.repository.ProjectRepository;
-
+import com.connectbundle.connect.service.UserService.UserServiceResponse;
 
 import lombok.Getter;
 
@@ -65,7 +82,7 @@ public class ProjectService {
         newProject.setOwnerId(ownerUser.getData());
         Project createdProject = projectRepository.save(newProject);
         ProjectResponseDTO responseDTO = modelMapper.map(createdProject, ProjectResponseDTO.class);
-        responseDTO.setOwnerId(createdProject.getOwnerId().getId());
+        //responseDTO.setOwnerId(createdProject.getOwnerId());
         return  BaseResponse.success(responseDTO, "Project created", 1);
     }
 
@@ -123,6 +140,85 @@ public class ProjectService {
                 .toList();
 
         return BaseResponse.success(projectDTOs, "Projects fetched successfully", projectDTOs.size());
+    }
+
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> updateProject (Long projectId, UpdateProjectDTO updateProjectDTO) {
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        if (optionalProject.isEmpty()) {
+            return BaseResponse.error("Project not", HttpStatus.NOT_FOUND);
+        }
+        Project project = optionalProject.get();
+        if (updateProjectDTO.getProjectName() != null) {
+            project.setProjectName(updateProjectDTO.getProjectName());
+        }
+        if (updateProjectDTO.getProjectDescription() != null) {
+            project.setProjectDescription(updateProjectDTO.getProjectDescription());
+        }
+        if (updateProjectDTO.getPrerequisites() != null) {
+            project.setPrerequisites(updateProjectDTO.getPrerequisites());
+        }
+        if (updateProjectDTO.getTechStack() != null) {
+            project.setTechStack(updateProjectDTO.getTechStack());
+        }
+        if (updateProjectDTO.getTags() != null) {
+            project.setTags(updateProjectDTO.getTags());
+        }
+        if (updateProjectDTO.getProjectDurationMonths() != null) {
+            project.setProjectDurationMonths(updateProjectDTO.getProjectDurationMonths());
+        }
+        if (updateProjectDTO.getProjectLevel() != null) {
+            project.setProjectLevel(updateProjectDTO.getProjectLevel());
+        }
+        if (updateProjectDTO.getProjectStatus() != null) {
+            project.setProjectStatus(updateProjectDTO.getProjectStatus());
+        }
+        Project updatedProject = projectRepository.save(project);
+        ProjectResponseDTO projectResponseDTO = modelMapper.map(updatedProject, ProjectResponseDTO.class);
+
+        return BaseResponse.success(projectResponseDTO, "Project Updated", 1);
+    }
+
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>>addUserToApplication(AddUserToApplicationDTO addUserToApplicationDTO) {
+        UserServiceResponse<User> optionalUser = userService.getUserByID(addUserToApplicationDTO.getUserID());
+        if (!optionalUser.isSuccess()) {
+            return BaseResponse.error("User not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<Project> optionalProject = projectRepository.findById(addUserToApplicationDTO.getProjectID());
+        if (optionalProject.isEmpty()) {
+            return BaseResponse.error("Project not found", HttpStatus.NOT_FOUND);
+        }
+        User user = optionalUser.getData();
+        Project project = optionalProject.get();
+        ProjectApplication projectApplication = new ProjectApplication();
+        projectApplication.setProject(project);
+        projectApplication.setStudent(user);
+        projectApplication.setStatus(ProjectApplicationStatus.APPLIED);
+        projectApplication.setApplicationDate(LocalDate.now());
+        project.getProjectApplications().add(projectApplication);
+        Project updatedProject = projectRepository.save(project);
+        ProjectResponseDTO projectResponseDTO = modelMapper.map(updatedProject, ProjectResponseDTO.class);
+        return BaseResponse.success(projectResponseDTO, "Added user", 1);
+    }
+
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>>addUserToProject(AddUserToApplicationDTO addUserToApplicationDTO) {
+        UserServiceResponse<User> optionalUser = userService.getUserByID(addUserToApplicationDTO.getUserID());
+        if (!optionalUser.isSuccess()) {
+            return BaseResponse.error("User not found", HttpStatus.NOT_FOUND);
+        }
+        Optional<Project> optionalProject = projectRepository.findById(addUserToApplicationDTO.getProjectID());
+        if (optionalProject.isEmpty()) {
+            return BaseResponse.error("Project not found", HttpStatus.NOT_FOUND);
+        }
+        User user = optionalUser.getData();
+        Project project = optionalProject.get();
+        ProjectTeamMember projectTeamMember = new ProjectTeamMember();
+        projectTeamMember.setProject(project);
+        projectTeamMember.setUser(user);
+        projectTeamMember.setRole(ProjectTeamRole.TEAM_MEMBER);
+        project.getProjectTeamMembers().add(projectTeamMember);
+        Project updatedProject = projectRepository.save(project);
+        ProjectResponseDTO projectResponseDTO = modelMapper.map(updatedProject, ProjectResponseDTO.class);
+        return BaseResponse.success(projectResponseDTO, "Added user", 1);
     }
 
 
