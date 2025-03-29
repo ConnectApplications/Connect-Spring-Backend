@@ -3,11 +3,14 @@ package com.connectbundle.connect.controller;
 import java.util.List;
 
 import com.connectbundle.connect.dto.ProjectsDTO.ProjectResponseDTO;
+import com.connectbundle.connect.dto.ProjectsDTO.UpdateProjectDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.dto.ProjectsDTO.AddUserToApplicationDTO;
 import com.connectbundle.connect.dto.ProjectsDTO.CreateProjectDTO;
 import com.connectbundle.connect.model.Project;
 import com.connectbundle.connect.service.ProjectService;
@@ -112,5 +116,24 @@ public class ProjectController {
     public ResponseEntity<BaseResponse<List<ProjectResponseDTO>>> getProjectsByUser(@PathVariable Long userId) {
         return projectService.getProjectsByUser(userId);
     }
+
+    @PatchMapping("/updateProjectById/{projectId}")
+    @Operation(summary = "Update project by Project ID", description = "Updates a project based on the project id")
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> updateById(@Valid @RequestBody UpdateProjectDTO updateProjectDTO, @PathVariable Long projectId) {
+        return projectService.updateProject(projectId, updateProjectDTO);
+    }
+
+    @PatchMapping("/addUserToProjectApplication")
+    @Operation(summary = "Add a user to project application", description = "Add a user to project application")
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> addUserToApplication(@Valid @RequestBody AddUserToApplicationDTO addUserToApplicationDTO) {
+        return projectService.addUserToApplication(addUserToApplicationDTO);
+    }
+
+    @PatchMapping("/addUserToProjectMember")
+    @Operation(summary = "Add a user to project", description = "Add a user to project")
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> addUserToProject(@Valid @RequestBody AddUserToApplicationDTO addUserToApplicationDTO) {
+        return projectService.addUserToProject(addUserToApplicationDTO);
+    }
+
 
 }
