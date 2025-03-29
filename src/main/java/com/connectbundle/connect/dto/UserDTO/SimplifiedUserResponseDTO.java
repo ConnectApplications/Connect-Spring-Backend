@@ -1,5 +1,7 @@
 package com.connectbundle.connect.dto.UserDTO;
 
+import com.connectbundle.connect.model.User.FacultyDetails;
+import com.connectbundle.connect.model.User.StudentDetails;
 import com.connectbundle.connect.model.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,5 +18,7 @@ public class SimplifiedUserResponseDTO {
     private String name;
     private String profilePicture;
     private String headline;
+    private StudentDetails studentDetails;
+    private FacultyDetails facultyDetails;
     private Role role;
 }
