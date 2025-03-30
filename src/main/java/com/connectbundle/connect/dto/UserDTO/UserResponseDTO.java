@@ -34,6 +34,6 @@ public class UserResponseDTO {
     private List<String> achievement;
     private List<String> interest;
     private List<ClubMemberResponseDTO> clubMemberships;
-
-
+//    private List<PublicationDTO> publications ;
+//    private List<ResearchProposalDTO> researchProposals;
 }

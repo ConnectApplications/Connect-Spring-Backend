@@ -32,8 +32,7 @@ public class ClubResponseDTO {
     private List<ClubMemberResponseDTO> members;
     private List<EventResponseDTO> events;
     private PlanOfActionDTO planOfAction;
-    
-    // Authenticated user's membership details
+
     private boolean userMember;
     private ClubRoleEnum userRole;
     private boolean canEdit;

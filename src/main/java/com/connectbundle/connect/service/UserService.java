@@ -18,6 +18,7 @@ import com.connectbundle.connect.model.enums.Role;
 import com.connectbundle.connect.repository.UserRepository;
 import lombok.Getter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +54,8 @@ public class UserService {
             return BaseResponse.error("Incorrect password", HttpStatus.UNAUTHORIZED);
         }
         String token = jwtService.generateToken(user, user.getRole().toString());
-        UserResponseDTO responseUser = modelMapper.map(user, UserResponseDTO.class);
+        Type listType = new TypeToken<UserResponseDTO>(){}.getType();
+        UserResponseDTO responseUser = modelMapper.map(user, listType);
         LoginResponseDTO responseDTO = new LoginResponseDTO(responseUser, token);
         return BaseResponse.success(responseDTO, "Login Success", 1);
     }
@@ -72,7 +75,8 @@ public class UserService {
         newUser.setStudentDetails(userDTO.getStudentDetails());
         newUser.setFacultyDetails(userDTO.getFacultyDetails());
         User savedUser = userRepository.save(newUser);
-        UserResponseDTO userResponseDTO = modelMapper.map(savedUser, UserResponseDTO.class);
+        Type listType = new TypeToken<UserResponseDTO>(){}.getType();
+        UserResponseDTO userResponseDTO = modelMapper.map(savedUser, listType);
         userResponseDTO.setAchievement(savedUser.getAchievement());
         userResponseDTO.setInterest(savedUser.getInterest());
         userResponseDTO.setSocialLinks(savedUser.getSocialLinks());
@@ -128,6 +132,7 @@ public class UserService {
     public ResponseEntity<BaseResponse<UserResponseDTO>> getUserByUsername(String username) {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
+
             UserResponseDTO userResponseDTO = modelMapper.map(user, UserResponseDTO.class);
             List<Post> posts = user.getPosts();
             List<PostResponseDTO> postResponseDTOS = posts.stream()

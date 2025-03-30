@@ -59,11 +59,11 @@ public class User {
     private List<UserSkill> userSkills;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Publication> publications = new ArrayList<>();
+    private List<Publication> publications ;
 
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ResearchProposal> researchProposals = new ArrayList<>();
+    private List<ResearchProposal> researchProposals;
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

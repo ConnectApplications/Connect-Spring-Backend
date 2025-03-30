@@ -64,25 +64,57 @@ public class ClubsService {
         club.setAdvisor(advisor);
         club.setCreatedBy(user);
         
-
         clubsRespository.save(club);
-        ClubResponseDTO clubResponse = modelMapper.map(club, ClubResponseDTO.class);
+        
+        // Create new DTO instead of using ModelMapper to avoid PersistentBag conversion issues
+        ClubResponseDTO clubResponse = new ClubResponseDTO();
+        
+        // Manually map simple properties
+        clubResponse.setId(club.getId());
+        clubResponse.setName(club.getName());
+        clubResponse.setBanner(club.getBanner());
+        clubResponse.setLogo(club.getLogo());
+        clubResponse.setDescription(club.getDescription());
+        clubResponse.setDepartment(club.getDepartment());
+        clubResponse.setActive(club.isActive());
+        
+        // Handle tags list
+        if (club.getTags() != null) {
+            clubResponse.setTags(safelyConvertCollection(club.getTags()));
+        }
+        
+        // Manually map createdBy
         clubResponse.setCreatedBy(modelMapper.map(club.getCreatedBy(), SimplifiedUserResponseDTO.class));
 
+        // Manually map advisor if exists
         if (club.getAdvisor() != null) {
             clubResponse.setAdvisor(modelMapper.map(club.getAdvisor(), SimplifiedUserResponseDTO.class));
         }
 
+        // Get fresh club from DB to ensure all collections are loaded
         club = clubsRespository.findById(club.getId()).orElse(club);
+        
+        // Manually map members collection
         List<ClubMemberResponseDTO> members = safelyConvertCollection(club.getMembers()).stream()
                 .map(this::mapClubMemberToDTO)
                 .toList();
         clubResponse.setMembers(members);
 
+        // Manually map events collection
+        if (club.getEvents() != null) {
+            List<Event> eventList = safelyConvertCollection(club.getEvents());
+            List<EventResponseDTO> eventDTOs = eventList.stream()
+                    .map(this::mapEventToDTO)
+                    .toList();
+            clubResponse.setEvents(eventDTOs);
+        } else {
+            clubResponse.setEvents(new ArrayList<>());
+        }
+
+        // Map PlanOfAction if exists
         if (club.getPlanOfAction() != null) {
             clubResponse.setPlanOfAction(modelMapper.map(club.getPlanOfAction(), PlanOfActionDTO.class));
         }
-        
 
         setUserMembershipDetails(clubResponse, club, user);
         
@@ -103,9 +135,24 @@ public class ClubsService {
         List<Club> clubs = clubsRespository.findAll();
         List<ClubResponseDTO> clubResponseDTOS = clubs.stream()
                 .map(club -> {
-                    ClubResponseDTO dto = modelMapper.map(club, ClubResponseDTO.class);
+                    // Create new DTO instead of using ModelMapper to avoid PersistentBag conversion issues
+                    ClubResponseDTO dto = new ClubResponseDTO();
                     
-                    // Manually map collections to avoid Hibernate PersistentBag conversion issues
+                    // Manually map simple properties
+                    dto.setId(club.getId());
+                    dto.setName(club.getName());
+                    dto.setBanner(club.getBanner());
+                    dto.setLogo(club.getLogo());
+                    dto.setDescription(club.getDescription());
+                    dto.setDepartment(club.getDepartment());
+                    dto.setActive(club.isActive());
+                    
+                    // Handle tags list
+                    if (club.getTags() != null) {
+                        dto.setTags(safelyConvertCollection(club.getTags()));
+                    }
+                    
+                    // Manually map object properties
                     if (club.getCreatedBy() != null) {
                         dto.setCreatedBy(modelMapper.map(club.getCreatedBy(), SimplifiedUserResponseDTO.class));
                     }
@@ -122,13 +169,13 @@ public class ClubsService {
                     
                     // Manually map events collection
                     if (club.getEvents() != null) {
-                        // Create a new ArrayList explicitly to disconnect from Hibernate's PersistentBag
                         List<Event> eventList = safelyConvertCollection(club.getEvents());
-                        
                         List<EventResponseDTO> eventDTOs = eventList.stream()
                                 .map(this::mapEventToDTO)
                                 .toList();
                         dto.setEvents(eventDTOs);
+                    } else {
+                        dto.setEvents(new ArrayList<>());
                     }
                     
                     // Map PlanOfAction if exists
@@ -158,9 +205,24 @@ public class ClubsService {
         Club club = clubsRespository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Club", "id", id));
 
-        ClubResponseDTO dto = modelMapper.map(club, ClubResponseDTO.class);
+        // Create new DTO instead of using ModelMapper to avoid PersistentBag conversion issues
+        ClubResponseDTO dto = new ClubResponseDTO();
         
-        // Manually map collections to avoid Hibernate PersistentBag conversion issues
+        // Manually map simple properties
+        dto.setId(club.getId());
+        dto.setName(club.getName());
+        dto.setBanner(club.getBanner());
+        dto.setLogo(club.getLogo());
+        dto.setDescription(club.getDescription());
+        dto.setDepartment(club.getDepartment());
+        dto.setActive(club.isActive());
+        
+        // Handle tags list
+        if (club.getTags() != null) {
+            dto.setTags(safelyConvertCollection(club.getTags()));
+        }
+        
+        // Manually map object properties
         if (club.getCreatedBy() != null) {
             dto.setCreatedBy(modelMapper.map(club.getCreatedBy(), SimplifiedUserResponseDTO.class));
         }
@@ -177,13 +239,13 @@ public class ClubsService {
         
         // Manually map events collection
         if (club.getEvents() != null) {
-            // Create a new ArrayList explicitly to disconnect from Hibernate's PersistentBag
             List<Event> eventList = safelyConvertCollection(club.getEvents());
-            
             List<EventResponseDTO> eventDTOs = eventList.stream()
                     .map(this::mapEventToDTO)
                     .toList();
             dto.setEvents(eventDTOs);
+        } else {
+            dto.setEvents(new ArrayList<>());
         }
         
         // Map PlanOfAction if exists
