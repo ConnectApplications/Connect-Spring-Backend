@@ -1,17 +1,12 @@
 package com.connectbundle.connect.model;
 
-import java.util.List;
-
 import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.model.enums.ProjectLevelEnum;
 import com.connectbundle.connect.model.enums.ProjectStatusEnum;
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -32,7 +27,7 @@ public class Project {
 
     @ManyToOne
     @JoinColumn(name = "ownerId", referencedColumnName = "id", nullable = false)
-    private User ownerId;
+    private User owner;
 
     @Column(columnDefinition = "TEXT")
     private String prerequisites;
@@ -45,11 +40,15 @@ public class Project {
     @JoinColumn(name = "verificationFacultyId", referencedColumnName = "id", nullable = true)
     private User verificationFaculty;
 
-    @Column(columnDefinition = "TEXT")
-    private String techStack;
+    private boolean verified = false;
 
-    @Column(columnDefinition = "TEXT")
-    private String tags;
+    @ElementCollection
+    private List<String> techStack;
+
+
+    @ElementCollection
+    private List<String> tags;
+
 
     @Column
     private Integer projectDurationMonths;
@@ -65,6 +64,9 @@ public class Project {
     private String projectImage;
 
     private String projectRepo;
+
+    @ElementCollection
+    private List<String> skills;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectApplication> projectApplications;
@@ -83,5 +85,7 @@ public class Project {
         if (this.projectStatus  == null) {
             this.projectStatus = ProjectStatusEnum.NOT_STARTED;
         }
+
+
     }
 }

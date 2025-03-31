@@ -18,7 +18,7 @@ public class ProjectResponseDTO {
     private Long id;
     private String projectName;
     private String projectDescription;
-    private SimplifiedUserResponseDTO ownerId;
+    private SimplifiedUserResponseDTO owner;
     private String prerequisites;
     private List<String> techStack;
     private List<String> tags;
