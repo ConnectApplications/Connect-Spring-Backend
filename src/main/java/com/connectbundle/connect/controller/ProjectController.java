@@ -1,21 +1,18 @@
 package com.connectbundle.connect.controller;
 
 import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.dto.ProjectsDTO.AddProjectMemberDTO;
 import com.connectbundle.connect.dto.ProjectsDTO.CreateProjectDTO;
 import com.connectbundle.connect.dto.ProjectsDTO.ProjectResponseDTO;
-import com.connectbundle.connect.model.Project;
 import com.connectbundle.connect.model.enums.ProjectLevelEnum;
 import com.connectbundle.connect.model.enums.ProjectStatusEnum;
 import com.connectbundle.connect.service.ProjectService;
-import com.connectbundle.connect.service.ProjectService.ProjectServiceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -32,19 +29,9 @@ public class ProjectController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Project By ID", description = "Retrieve a project by its ID")
-    public ResponseEntity<BaseResponse<Project>> getProject(@PathVariable Long id) {
-        try {
-            ProjectServiceResponse<Project> projectServiceResponse = projectService.getProjectByID(id);
-            boolean success = projectServiceResponse.isSuccess();
-            if (success) {
-                Project project = projectServiceResponse.getData();
-                String message = projectServiceResponse.getMessage();
-                return BaseResponse.success(project, message, 1);
-            }
-            return BaseResponse.error(projectServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> getProject(@PathVariable Long id) {
+         return projectService.getProjectByID(id);
+
     }
 
     @PostMapping()
@@ -53,29 +40,29 @@ public class ProjectController {
         return projectService.createProject(projectDTO);
     }
 
-    @PostMapping("/uploadProjectImage/{id}")
-    @Operation(summary = "Upload Project Image", description = "Upload or update an image for the project with the given ID")
-    public ResponseEntity<BaseResponse<Void>> uploadProjectImage(
-            @RequestParam("file") MultipartFile file,
-            @PathVariable Long id) {
-        try {
-            ProjectServiceResponse<Project> projectServiceResponse = projectService.getProjectByID(id);
-            boolean success = projectServiceResponse.isSuccess();
-            if (success) {
-                Project project = projectServiceResponse.getData();
-                ProjectServiceResponse<Void> uploadedImage = projectService.uploadProjectImage(file, project);
-                if (uploadedImage.isSuccess()) {
-                    return BaseResponse.success(null, uploadedImage.getMessage(), null);
-                } else {
-                    return BaseResponse.error(uploadedImage.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            } else {
-                return BaseResponse.error(projectServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } catch (Exception e) {
-            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @PostMapping("/uploadProjectImage/{id}")
+//    @Operation(summary = "Upload Project Image", description = "Upload or update an image for the project with the given ID")
+//    public ResponseEntity<BaseResponse<Void>> uploadProjectImage(
+//            @RequestParam("file") MultipartFile file,
+//            @PathVariable Long id) {
+//        try {
+//            ResponseEntity<BaseResponse<ProjectResponseDTO>> projectServiceResponse = projectService.getProjectByID(id);
+//            boolean success = projectServiceResponse.isSuccess();
+//            if (success) {
+//                Project project = projectServiceResponse.getData();
+//                ProjectServiceResponse<Void> uploadedImage = projectService.uploadProjectImage(file, project);
+//                if (uploadedImage.isSuccess()) {
+//                    return BaseResponse.success(null, uploadedImage.getMessage(), null);
+//                } else {
+//                    return BaseResponse.error(uploadedImage.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//                }
+//            } else {
+//                return BaseResponse.error(projectServiceResponse.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        } catch (Exception e) {
+//            return BaseResponse.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     @GetMapping()
     @Operation(summary = "Get All Projects", description = "Retrieve a list of all projects")
@@ -124,5 +111,11 @@ public class ProjectController {
 //        return projectService.addUserToProject(addUserToApplicationDTO);
 //    }
 
+
+    @PostMapping("/addMember")
+    @Operation(summary = "Add Project Member", description = "Adds a member to a project team")
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> addProjectMember(@RequestBody AddProjectMemberDTO dto) {
+        return projectService.addProjectMember(dto);
+    }
 
 }

@@ -1,13 +1,17 @@
 package com.connectbundle.connect.service;
 
 import com.connectbundle.connect.dto.BaseResponse;
+import com.connectbundle.connect.dto.ProjectsDTO.AddProjectMemberDTO;
 import com.connectbundle.connect.dto.ProjectsDTO.CreateProjectDTO;
 import com.connectbundle.connect.dto.ProjectsDTO.ProjectResponseDTO;
+import com.connectbundle.connect.dto.ProjectsDTO.ProjectTeamMemberDTO;
 import com.connectbundle.connect.exception.ResourceNotFoundException;
 import com.connectbundle.connect.model.Project;
+import com.connectbundle.connect.model.ProjectTeamMember;
 import com.connectbundle.connect.model.User.User;
 import com.connectbundle.connect.model.enums.ProjectLevelEnum;
 import com.connectbundle.connect.model.enums.ProjectStatusEnum;
+import com.connectbundle.connect.model.enums.ProjectTeamRole;
 import com.connectbundle.connect.repository.ProjectRepository;
 import com.connectbundle.connect.repository.UserRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -23,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -38,18 +42,13 @@ public class ProjectService {
     private ModelMapper modelMapper;
 
 
-    public ProjectServiceResponse<Project> getProjectByID(Long id) {
-        try {
-            Optional<Project> optionalProject = projectRepository.findById(id);
-            if (optionalProject.isPresent()) {
-                Project project = optionalProject.get();
-                return new ProjectServiceResponse<>(true, "Project found", project);
-            } else {
-                return new ProjectServiceResponse<>(false, "Project not found", null);
-            }
-        } catch (Exception e) {
-            return new ProjectServiceResponse<>(false, e.getMessage(), null);
-        }
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> getProjectByID(Long id) {
+        Project Project = projectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", "id", id));
+        ProjectResponseDTO responseDTO = modelMapper.map(Project, ProjectResponseDTO.class);
+
+        return BaseResponse.success(responseDTO, "Project Fetched Successfully", 1);
+
     }
 
     public ResponseEntity<BaseResponse<ProjectResponseDTO> >createProject(CreateProjectDTO projectDTO) {
@@ -243,6 +242,37 @@ public class ProjectService {
                 .toList();
 
         return BaseResponse.success(responseDTOs, "Projects fetched successfully", responseDTOs.size());
+    }
+
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> addProjectMember(AddProjectMemberDTO dto) {
+        Project project = projectRepository.findById(dto.getProjectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Project", "ID", dto.getProjectId()));
+        User user = userRepository.findByUsername(dto.getUserName())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Username",dto.getUserName()));
+
+        boolean alreadyMember = project.getProjectTeamMembers()
+                .stream()
+                .anyMatch(ptm -> ptm.getUser().getId().equals(user.getId()));
+        if (alreadyMember) {
+            return BaseResponse.error("User is already a part of the project", HttpStatus.BAD_REQUEST);
+        }
+
+        ProjectTeamRole role = dto.getRole() != null ? dto.getRole() : ProjectTeamRole.TEAM_MEMBER;
+
+        ProjectTeamMember teamMember = new ProjectTeamMember();
+        teamMember.setProject(project);
+        teamMember.setUser(user);
+        teamMember.setRole(role);
+        project.getProjectTeamMembers().add(teamMember);
+        Project updatedProject = projectRepository.save(project);
+        ProjectResponseDTO responseDTO = modelMapper.map(updatedProject, ProjectResponseDTO.class);
+
+        List<ProjectTeamMemberDTO> teamMembers = updatedProject.getProjectTeamMembers()
+                .stream()
+                .map(ptm -> modelMapper.map(ptm, ProjectTeamMemberDTO.class))
+                .collect(Collectors.toList());
+        responseDTO.setProjectTeamMembers(teamMembers);
+        return BaseResponse.success(responseDTO, "Project member added successfully", 1);
     }
 
     // RESPONSE CLASS
