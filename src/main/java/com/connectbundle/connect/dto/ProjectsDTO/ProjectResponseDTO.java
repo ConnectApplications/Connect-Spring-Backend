@@ -1,5 +1,6 @@
 package com.connectbundle.connect.dto.ProjectsDTO;
 
+import com.connectbundle.connect.dto.ProjectApplicationDTO.ProjectApplicationDTO;
 import com.connectbundle.connect.dto.UserDTO.BaseUserResponseDTO;
 import com.connectbundle.connect.model.enums.ProjectLevelEnum;
 import com.connectbundle.connect.model.enums.ProjectStatusEnum;
@@ -28,4 +29,6 @@ public class ProjectResponseDTO {
     private String projectImage;
     private String projectRepo;
     private List<ProjectTeamMemberDTO> projectTeamMembers;
+    private List<ProjectApplicationDTO> projectApplications;
+
 }

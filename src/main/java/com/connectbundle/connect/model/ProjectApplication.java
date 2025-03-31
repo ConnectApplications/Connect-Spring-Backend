@@ -27,8 +27,8 @@ public class ProjectApplication {
     private Project project;
 
     @ManyToOne
-    @JoinColumn(name = "student_id", referencedColumnName = "id", nullable = false)
-    private User student;
+    @JoinColumn(name = "applicant_id", referencedColumnName = "id", nullable = false)
+    private User applicant;
 
     @Column(nullable = false)
     private LocalDate applicationDate;
