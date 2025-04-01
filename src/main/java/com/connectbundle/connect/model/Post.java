@@ -43,8 +43,10 @@ public class Post {
 
     @Column
     private List<String> tags = new ArrayList<>();
-    @Column
+
+
     private String media;
+
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

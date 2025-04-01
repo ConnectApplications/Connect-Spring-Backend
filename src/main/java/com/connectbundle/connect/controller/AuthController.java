@@ -51,6 +51,12 @@ public class AuthController {
 
     }
 
+    @PostMapping("/guest/register")
+    @Operation(summary = "Register Guest User", description = "Register a guest user with default password and role")
+    public ResponseEntity<BaseResponse<UserResponseDTO>> guestRegister(@Valid @RequestBody CreateUserDTO guestUser) {
+        return userService.guestRegister(guestUser);
+    }
+
     @PostMapping("/send-otp")
     @Operation(summary = "Send OTP", description = "Send an OTP to the user's email")
     public ResponseEntity<BaseResponse<String>> sendOtp(@Valid @RequestBody SendOtpRequest sendOtpRequest) {

@@ -1,15 +1,14 @@
 package com.connectbundle.connect.dto.PostsDTO;
 
 import com.connectbundle.connect.dto.CommentDTO.CommentResponseDTO;
+import com.connectbundle.connect.model.enums.PostTypeEnum;
 import com.connectbundle.connect.model.enums.PostVisibilityEnum;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -18,16 +17,16 @@ import java.util.List;
 @NoArgsConstructor
 public class PostResponseDTO {
     private String id;
-    private String type;
-    private String visibility;
+    private PostTypeEnum type;
+    private PostVisibilityEnum visibility;
     private String content;
-    private String createdAt;
-    private Long likes;
-    private Long comments;
+    private LocalDateTime createdAt;
+    private List<LikeResponseDTO> likes;
+    private List<CommentResponseDTO> comments;
     private Boolean isLikedByUser;
     private Boolean isBookmarked;
     private PostAuthorDTO author;
-    private PostMediaDTO media;
+    private String media;
     private List<String> tags;
     private List<CommentResponseDTO> commentList;
 

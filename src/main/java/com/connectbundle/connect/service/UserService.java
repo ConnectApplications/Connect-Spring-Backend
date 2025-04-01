@@ -60,6 +60,21 @@ public class UserService {
         return BaseResponse.success(responseDTO, "Login Success", 1);
     }
 
+    public ResponseEntity<BaseResponse<UserResponseDTO>> guestRegister(CreateUserDTO guestUser) {
+        guestUser.setPassword("root");
+
+        User user = new User();
+        user.setUsername(guestUser.getUsername());
+        user.setEmail(guestUser.getEmail());
+        user.setPassword(passwordEncoder.encode(guestUser.getPassword()));
+        user.setName(guestUser.getName());
+        user.setRole(Role.STUDENT);
+        userRepository.save(user);
+        UserResponseDTO responseDTO = modelMapper.map(user, UserResponseDTO.class);
+
+        return BaseResponse.success(responseDTO, "Guest user registered successfully", 1);
+    }
+
     public ResponseEntity<BaseResponse<UserResponseDTO>> registerUser(CreateUserDTO userDTO) {
         if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
             throw new ResourceAlreadyExistsException("User", "username", userDTO.getUsername());

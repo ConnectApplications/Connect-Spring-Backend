@@ -5,10 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class PostAuthorDTO {
-    private String name;
-    private String profilePicture;
-    private String headline;
+@AllArgsConstructor
+public class CommentRequest {
+    private String content;
 }
+

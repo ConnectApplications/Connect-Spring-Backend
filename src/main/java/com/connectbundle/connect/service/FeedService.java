@@ -6,9 +6,9 @@ import com.connectbundle.connect.dto.PostsDTO.PostResponseDTO;
 import com.connectbundle.connect.model.Post;
 import com.connectbundle.connect.repository.FeedRepository;
 import com.connectbundle.connect.repository.LikeRepository;
-import org.apache.commons.lang3.concurrent.UncheckedFuture;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -26,21 +26,25 @@ public class FeedService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Value("${s3_public_url_prefix}")
+    private String S3_PUBLIC_URL_PREFIX;
+
     public ResponseEntity<BaseResponse<List<PostResponseDTO>>> getAllPostsInReverseOrder() {
         List<Post> feed = feedRepository.findAllByOrderByCreatedAtDesc();
         List<PostResponseDTO> postResponseDTOS = feed.stream()
-                .map(post -> {
-                    PostResponseDTO postDTO = modelMapper.map(post, PostResponseDTO.class);
-
-                    PostAuthorDTO authorDTO = modelMapper.map(post.getAuthor(), PostAuthorDTO.class);
-
-                    postDTO.setAuthor(authorDTO);
-//                    postDTO.setIsLikedByUser(likeRepository.existsByPostIdAndUserId(post.getId(), userId));
-//                    postDTO.setIsBookmarked(bookmarkRepository.existsByPostIdAndUserId(post.getId(), userId));
-
-                    return postDTO;
-                })
+                .map(this::mapPostToResponseDTO)
                 .toList();
         return BaseResponse.success(postResponseDTOS,"Feed fetched successfully",postResponseDTOS.size());
+    }
+    private PostResponseDTO mapPostToResponseDTO(Post post) {
+        PostResponseDTO dto = modelMapper.map(post, PostResponseDTO.class);
+        PostAuthorDTO authorDTO = modelMapper.map(post.getAuthor(), PostAuthorDTO.class);
+        dto.setAuthor(authorDTO);
+
+        if (post.getMedia() != null && !post.getMedia().isBlank()) {
+            dto.setMedia(S3_PUBLIC_URL_PREFIX + post.getMedia());
+        }
+
+        return dto;
     }
 }

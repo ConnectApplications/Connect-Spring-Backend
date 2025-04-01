@@ -13,11 +13,13 @@ import com.connectbundle.connect.repository.PostsRepository;
 import com.connectbundle.connect.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -28,6 +30,8 @@ public class PostsService {
     private PostsRepository postsRepository;
 
     @Autowired
+    private S3Service s3Service;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private ModelMapper modelMapper;
@@ -35,18 +39,14 @@ public class PostsService {
     @Autowired
     private IdGenerator idGenerator;
 
+    @Value("${s3_public_url_prefix}")
+    private String S3_PUBLIC_URL_PREFIX;
+
+
     public ResponseEntity<BaseResponse<List<PostResponseDTO>>> getAllPosts(){
         List<Post> posts = postsRepository.findAll();
         List<PostResponseDTO> postResponseDTOS = posts.stream()
-                .map(post -> {
-                    PostResponseDTO postDTO = modelMapper.map(post, PostResponseDTO.class);
-
-                    PostAuthorDTO authorDTO = modelMapper.map(post.getAuthor(), PostAuthorDTO.class);
-
-                    postDTO.setAuthor(authorDTO);
-
-                    return postDTO;
-                })
+                .map(this::mapPostToResponseDTO)
                 .toList();
 
         return BaseResponse.success(postResponseDTOS, "Posts fetched successfully", postResponseDTOS.size());
@@ -57,25 +57,66 @@ public class PostsService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
         List<Post> posts = postsRepository.findByAuthorId(user.getId());
         List<PostResponseDTO> postResponseDTOS = posts.stream()
-                .map(post -> {
-                    PostResponseDTO postDTO = modelMapper.map(post, PostResponseDTO.class);
-
-                    PostAuthorDTO authorDTO = modelMapper.map(post.getAuthor(), PostAuthorDTO.class);
-
-                    postDTO.setAuthor(authorDTO);
-
-                    return postDTO;
-                })
+                .map(this::mapPostToResponseDTO)
                 .toList();
+
         return BaseResponse.success(postResponseDTOS,"Posts fetched successfully",postResponseDTOS.size());
     }
-    public ResponseEntity<BaseResponse<PostResponseDTO>> createPost(CreatePostDTO postDTO) throws NoSuchAlgorithmException {
+    public ResponseEntity<BaseResponse<PostResponseDTO>> createPost(CreatePostDTO postDTO, MultipartFile mediaFile,String userName) throws NoSuchAlgorithmException {
+        // Validate required fields
+        if (postDTO.getContent() == null || postDTO.getContent().trim().isEmpty()) {
+            return BaseResponse.error("Post content is required", HttpStatus.BAD_REQUEST);
+        }
+        
+        if (postDTO.getType() == null) {
+            return BaseResponse.error("Post type is required", HttpStatus.BAD_REQUEST);
+        }
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             return BaseResponse.error("Unauthorized access", HttpStatus.UNAUTHORIZED);
         }
-        String username = authentication.getName();
+//        String username = authentication.getName();
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Username", userName));
+
+        Post post = modelMapper.map(postDTO, Post.class);
+        post.setId(idGenerator.generateUniqueId(user.getEmail()));
+        post.setAuthor(user);
+        
+        // Handle file upload if media is provided
+        if (mediaFile != null && !mediaFile.isEmpty()) {
+            try {
+                String key = s3Service.uploadFile(mediaFile, "post/");
+                post.setMedia(key);
+            } catch (Exception e) {
+                // Log the error but don't fail the whole post creation
+                System.err.println("Failed to upload media file: " + e.getMessage());
+                // Set media to null to indicate no media was uploaded
+                post.setMedia(null);
+            }
+        }
+
+        Post savedPost = postsRepository.save(post);
+        PostResponseDTO postResponseDTO = mapPostToResponseDTO(savedPost);
+
+
+        return BaseResponse.success(postResponseDTO, "Post saved successfully", 1);
+    }
+
+    public ResponseEntity<BaseResponse<PostResponseDTO>> createPostGuest(CreatePostDTO postDTO, MultipartFile mediaFile,String username) throws NoSuchAlgorithmException {
+        // Validate required fields
+        if (postDTO.getContent() == null || postDTO.getContent().trim().isEmpty()) {
+            return BaseResponse.error("Post content is required", HttpStatus.BAD_REQUEST);
+        }
+
+        if (postDTO.getType() == null) {
+            return BaseResponse.error("Post type is required", HttpStatus.BAD_REQUEST);
+        }
+
+
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Username", username));
 
@@ -83,11 +124,24 @@ public class PostsService {
         post.setId(idGenerator.generateUniqueId(user.getEmail()));
         post.setAuthor(user);
 
+        // Handle file upload if media is provided
+        if (mediaFile != null && !mediaFile.isEmpty()) {
+            try {
+                String key = s3Service.uploadFile(mediaFile, "post/");
+                post.setMedia(key);
+            } catch (Exception e) {
+                // Log the error but don't fail the whole post creation
+                System.err.println("Failed to upload media file: " + e.getMessage());
+                // Set media to null to indicate no media was uploaded
+                post.setMedia(null);
+            }
+        }
+
         Post savedPost = postsRepository.save(post);
-        PostResponseDTO postResponseDTO = modelMapper.map(savedPost, PostResponseDTO.class);
-        PostAuthorDTO authorDTO = modelMapper.map(postResponseDTO.getAuthor(), PostAuthorDTO.class);
-        postResponseDTO.setAuthor(authorDTO);
-        return BaseResponse.success(postResponseDTO, "Post saved successfully",1);
+        PostResponseDTO postResponseDTO = mapPostToResponseDTO(savedPost);
+
+
+        return BaseResponse.success(postResponseDTO, "Post saved successfully", 1);
     }
 
 
@@ -113,12 +167,11 @@ public class PostsService {
         if (postDTO.getType() != null) post.setType(postDTO.getType());
         if (postDTO.getVisibility() != null) post.setVisibility(postDTO.getVisibility());
         if (postDTO.getTags() != null) post.setTags(postDTO.getTags());
-        if (postDTO.getMedia() != null) post.setMedia(postDTO.getMedia());
+//        if (postDTO.getMedia() != null) post.setMedia(postDTO.getMedia());
 
         Post savedPost = postsRepository.save(post);
-        PostResponseDTO postResponseDTO = modelMapper.map(savedPost, PostResponseDTO.class);
-        PostAuthorDTO authorDTO = modelMapper.map(postResponseDTO.getAuthor(), PostAuthorDTO.class);
-        postResponseDTO.setAuthor(authorDTO);
+        PostResponseDTO postResponseDTO = mapPostToResponseDTO(savedPost);
+
         return BaseResponse.success(postResponseDTO, "Post saved successfully",1);
     }
     public ResponseEntity<BaseResponse<Void>> deletePost(String id) {
@@ -141,6 +194,18 @@ public class PostsService {
 
         postsRepository.delete(post);
         return BaseResponse.success(null, "Post deleted successfully", 1);
+    }
+
+    private PostResponseDTO mapPostToResponseDTO(Post post) {
+        PostResponseDTO dto = modelMapper.map(post, PostResponseDTO.class);
+        PostAuthorDTO authorDTO = modelMapper.map(post.getAuthor(), PostAuthorDTO.class);
+        dto.setAuthor(authorDTO);
+
+        if (post.getMedia() != null && !post.getMedia().isBlank()) {
+            dto.setMedia(S3_PUBLIC_URL_PREFIX + post.getMedia());
+        }
+
+        return dto;
     }
 
 

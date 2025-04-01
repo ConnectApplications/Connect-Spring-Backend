@@ -19,6 +19,5 @@ public class CreatePostDTO {
     private PostTypeEnum type;
     private String visibility;
     private String[] tags;
-    private String media;
-
+    private String userName;
 }
