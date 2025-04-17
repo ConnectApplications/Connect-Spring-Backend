@@ -38,4 +38,10 @@ public class ProjectApplication {
 
     @Column(nullable = false)
     private boolean isMentorRequest = false;
+
+    @Column(length = 500)
+    private String description;
+
+
+
 }

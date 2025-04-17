@@ -44,7 +44,22 @@ public class ProjectApplicationService {
 
         User applicant = userRepository.findByUsername(dto.getApplicantUserName())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Username", dto.getApplicantUserName()));
-        // Create the application with current date and status APPLIED
+        boolean alreadyMember = project.getProjectTeamMembers()
+                .stream()
+                .anyMatch(member -> member.getUser().getId().equals(applicant.getId()));
+
+        if (alreadyMember) {
+            return BaseResponse.error("User is already a member of the project", HttpStatus.BAD_REQUEST);
+        }
+
+        // Check if user has already applied to this project
+        boolean hasExistingApplication = projectApplicationRepository
+                .existsByProjectAndApplicantAndStatusIn(project, applicant,
+                        List.of(ProjectApplicationStatus.APPLIED, ProjectApplicationStatus.APPLIED));
+
+        if (hasExistingApplication) {
+            return BaseResponse.error("User has already applied for this project", HttpStatus.BAD_REQUEST);
+        }
         ProjectApplication application = new ProjectApplication();
         application.setProject(project);
         application.setApplicant(applicant);
@@ -58,41 +73,67 @@ public class ProjectApplicationService {
         return BaseResponse.success(responseDto, "Application submitted successfully", 1);
     }
 
-    public ResponseEntity<BaseResponse<ProjectResponseDTO>> acceptApplication(Long applicationId) {
-        // Fetch the application by its ID
+    public ResponseEntity<BaseResponse<ProjectResponseDTO>> processApplication(Long applicationId, boolean accept, String description) {
+
         ProjectApplication application = projectApplicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("ProjectApplication", "ID", applicationId));
-        // Ensure the application is still pending
-        if (application.getStatus() != ProjectApplicationStatus.APPLIED) {
-            return BaseResponse.error("Application is not in pending state", HttpStatus.BAD_REQUEST);
+
+        if (accept) {
+            boolean alreadyMember = application.getProject().getProjectTeamMembers()
+                    .stream()
+                    .anyMatch(member -> member.getUser().getId().equals(application.getApplicant().getId()));
+            if (!alreadyMember) {
+                ProjectTeamRole teamRole = application.isMentorRequest() ? ProjectTeamRole.MENTOR : ProjectTeamRole.TEAM_MEMBER;
+
+                if (teamRole == ProjectTeamRole.MENTOR && application.getProject().getFacultyMentor() == null) {
+                    application.getProject().setFacultyMentor(application.getApplicant());
+                }
+
+                ProjectTeamMember teamMember = new ProjectTeamMember();
+                teamMember.setProject(application.getProject());
+                teamMember.setUser(application.getApplicant());
+                teamMember.setRole(teamRole);
+                application.getProject().getProjectTeamMembers().add(teamMember);
+            }
+
+            application.setStatus(ProjectApplicationStatus.ACCEPTED);
+            application.setDescription(description);
+
+            Project updatedProject = projectRepository.save(application.getProject());
+            projectApplicationRepository.save(application);
+
+            ProjectResponseDTO projectResponseDTO = modelMapper.map(updatedProject, ProjectResponseDTO.class);
+            List<ProjectTeamMemberDTO> teamMembers = updatedProject.getProjectTeamMembers()
+                    .stream()
+                    .map(ptm -> modelMapper.map(ptm, ProjectTeamMemberDTO.class))
+                    .collect(Collectors.toList());
+            projectResponseDTO.setProjectTeamMembers(teamMembers);
+
+            return BaseResponse.success(projectResponseDTO, "Application accepted", 1);
+        } else {
+            application.getProject().getProjectTeamMembers()
+                    .removeIf(member -> member.getUser().getId().equals(application.getApplicant().getId()));
+
+            if (application.isMentorRequest() && application.getProject().getFacultyMentor() != null &&
+                    application.getProject().getFacultyMentor().getId().equals(application.getApplicant().getId())) {
+                application.getProject().setFacultyMentor(null);
+            }
+
+            application.setStatus(ProjectApplicationStatus.REJECTED);
+            application.setDescription(description);
+
+            Project updatedProject = projectRepository.save(application.getProject());
+            projectApplicationRepository.save(application);
+
+            ProjectResponseDTO projectResponseDTO = modelMapper.map(updatedProject, ProjectResponseDTO.class);
+            List<ProjectTeamMemberDTO> teamMembers = updatedProject.getProjectTeamMembers()
+                    .stream()
+                    .map(ptm -> modelMapper.map(ptm, ProjectTeamMemberDTO.class))
+                    .collect(Collectors.toList());
+            projectResponseDTO.setProjectTeamMembers(teamMembers);
+
+            return BaseResponse.success(projectResponseDTO, "Application rejected", 0);
         }
-        // Determine team role based on the mentor request flag
-        ProjectTeamRole teamRole = application.isMentorRequest() ? ProjectTeamRole.MENTOR : ProjectTeamRole.TEAM_MEMBER;
-        // Check if the applicant is already a member of the project
-        boolean alreadyMember = application.getProject().getProjectTeamMembers()
-                .stream()
-                .anyMatch(member -> member.getUser().getId().equals(application.getApplicant().getId()));
-        if (alreadyMember) {
-            return BaseResponse.error("User is already a member of the project", HttpStatus.BAD_REQUEST);
-        }
-        // Create a new team member from the application and add to the project
-        ProjectTeamMember teamMember = new ProjectTeamMember();
-        teamMember.setProject(application.getProject());
-        teamMember.setUser(application.getApplicant());
-        teamMember.setRole(teamRole);
-        application.getProject().getProjectTeamMembers().add(teamMember);
-        // Update application status to APPROVED
-        application.setStatus(ProjectApplicationStatus.ACCEPTED);
-        // Save the updated project and application
-        Project updatedProject = projectRepository.save(application.getProject());
-        projectApplicationRepository.save(application);
-        // Map updated project to response DTO and manually map the team members list
-        ProjectResponseDTO projectResponseDTO = modelMapper.map(updatedProject, ProjectResponseDTO.class);
-        List<ProjectTeamMemberDTO> teamMembers = updatedProject.getProjectTeamMembers()
-                .stream()
-                .map(ptm -> modelMapper.map(ptm, ProjectTeamMemberDTO.class))
-                .collect(Collectors.toList());
-        projectResponseDTO.setProjectTeamMembers(teamMembers);
-        return BaseResponse.success(projectResponseDTO, "Application accepted and member added", 1);
     }
+
 }
